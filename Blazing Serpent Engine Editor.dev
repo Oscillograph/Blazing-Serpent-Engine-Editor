@@ -1,0 +1,137 @@
+[Project]
+filename = Blazing Serpent Engine Editor.dev
+name = Blazing Serpent Engine Editor
+UnitCount = 3
+Type = 1
+Ver = 3
+Includes = %APP_PATH%/projects/Blazing Serpent Engine/BSE;%APP_PATH%/projects/Blazing Serpent Engine;%APP_PATH%/projects/Blazing Serpent Engine/BSE/vendor
+Libs = %APP_PATH%/projects/Blazing Serpent Engine Editor
+Bins = %APP_PATH%/projects/Blazing Serpent Engine Editor
+ResourceIncludes = 
+MakeIncludes = 
+PrivateResource = Blazing_Serpent_Engine_Editor_private.rc
+Compiler = 
+CppCompiler = -D BSE_PLATFORM_WINDOWS -D BSE_DLL -D BSE_ENABLE_ASSERTS -D SPDLOG_COMPILED_LIB
+Linker = libBlazing_Serpent_Engine.a_@@_libspdlog.a_@@_libDear_ImGui.a_@@_libglfw3dll.a_@@_libGlad.a
+ResourceCommand = 
+IsCpp = 1
+Icon = app.ico
+ExeOutput = 
+ObjectOutput = 
+LogOutput = 
+LogOutputEnabled = 0
+OverrideOutput = 0
+OverrideOutputName = 
+HostApplication = 
+UseCustomMakefile = 0
+CustomMakefile = 
+UsePrecompiledHeader = 0
+PrecompiledHeader = 
+CommandLine = 
+Folders = 
+IncludeVersionInfo = 1
+SupportXPThemes = 0
+CompilerSet = 7
+StaticLink = 0
+AddCharset = 1
+ExecEncoding = UTF-8
+Encoding = UTF-8
+ModelType = 0
+ClassBrowserType = 0
+AllowParallelBuilding = false
+ParellelBuildingJobs = 0
+UseUTF8 = 1
+
+
+[Unit1]
+FileName = src/SceneViewer.h
+CompileCpp = 0
+Folder = Headers/src
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = ASCII
+
+
+[VersionInfo]
+Major = 1
+Minor = 0
+Release = 0
+Build = 25
+LanguageID = 1033
+CharsetID = 1252
+CompanyName = TOT Creative Labs
+FileVersion = 1.0.0.0
+FileDescription = Complex Editor for apps built using Blazing Serpent Engine
+InternalName = BSEE
+LegalCopyright = 
+LegalTrademarks = 
+OriginalFilename = Blazing Serpent Engine Editor.exe
+ProductName = Blazing Serpent Engine Editor
+ProductVersion = 1.0.0.0
+AutoIncBuildNr = 1
+SyncProduct = 1
+
+
+[Unit2]
+FileName = .gitignore
+Folder = Others
+Compile = 0
+Link = 0
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = ASCII
+CompileCpp = 0
+
+
+[Unit3]
+FileName = main.cpp
+CompileCpp = 1
+Folder = Sources
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[Unit4]
+FileName = main.cpp
+CompileCpp = 1
+Folder = Sources
+Compile = 1
+Link = 1
+Priority = 1000
+OverrideBuildCmd = 0
+BuildCmd = 
+FileEncoding = PROJECT
+RealEncoding = UTF-8
+
+
+[CompilerSettings]
+c_cmd_opt_std = c17
+cc_cmd_opt_abort_on_error = 
+cc_cmd_opt_check_iso_conformance = 
+cc_cmd_opt_debug_info = on
+cc_cmd_opt_inhibit_all_warning = 
+cc_cmd_opt_instruction = 
+cc_cmd_opt_optimize = 
+cc_cmd_opt_pointer_size = 
+cc_cmd_opt_profile_info = 
+cc_cmd_opt_stack_protector = 
+cc_cmd_opt_std = c++17
+cc_cmd_opt_syntax_only = 
+cc_cmd_opt_use_pipe = on
+cc_cmd_opt_warning_all = on
+cc_cmd_opt_warning_as_error = 
+cc_cmd_opt_warning_extra = 
+link_cmd_opt_no_console = 
+link_cmd_opt_no_link_stdlib = 
+link_cmd_opt_strip_exe = 
