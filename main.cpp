@@ -2,6 +2,7 @@
 #include <EntryPoint.h>
 
 #include "hacks.h"
+#include "./src/ClientData.h"
 #include "./src/SceneViewer.h"
 
 class EditorGuiLayer : public BSE::ImGuiLayer {
@@ -19,19 +20,7 @@ public:
 	void OnImGuiRender(float time) {
 		FixImGuiContext(m_ImGuiContext);
 
-		// If you strip some features of, this demo is pretty much equivalent to calling DockSpaceOverViewport()!
-		// In most cases you should be able to just call DockSpaceOverViewport() and ignore all the code below!
-		// In this specific demo, we are not using DockSpaceOverViewport() because:
-		// - we allow the host window to be floating/moveable instead of filling the viewport (when opt_fullscreen == false)
-		// - we allow the host window to have padding (when opt_padding == true)
-		// - we have a local menu bar in the host window (vs. you could use BeginMainMenuBar() + DockSpaceOverViewport() in your code!)
-		// TL;DR; this demo is more complicated than what you would normally use.
-		// If we removed all the options we are showcasing, this demo would become:
-		//     void ShowExampleAppDockSpace()
-		//     {
-		//         ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-		//     }
-		
+		// a big part of this code is taken from ShowDockSpaceExample or sort of that function name in imgui_demo.cpp
 		static bool dockspace_open = true;
 		static bool opt_fullscreen = true;
 		static bool opt_padding = false;
@@ -99,6 +88,7 @@ public:
 			ImGui::Begin(u8"Сцена");
 				// TODO: AssetManager, GameData storage
 				// ImGui::Image((void*)(BSE::AssetManager->GetTexture(GameData->Textures[0])->GetID()), {1.0f, 1.0f});
+				ClientData::ViewPortFocused = ImGui::IsWindowFocused();
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 				if ((m_ViewportSize.x != viewportPanelSize.x) || (m_ViewportSize.y != viewportPanelSize.y)){
 					m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
@@ -118,6 +108,9 @@ public:
 		
 			ImGui::Begin(u8"Разные настройки");
 				ImGui::ColorPicker4(u8"Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
+				
+				static char buf[256] = u8"Фыва";
+				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
 			ImGui::End();
 		
 		ImGui::End();

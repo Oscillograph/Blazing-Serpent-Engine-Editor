@@ -1,7 +1,7 @@
 #ifndef BSEEDITOR_SCENEVIEWER_H
 #define BSEEDITOR_SCENEVIEWER_H
 
-#include <BSE_Client.h>
+// #include <BSE_Client.h>
 
 class SceneViewer : public BSE::Layer {
 public:
@@ -57,7 +57,8 @@ public:
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// CAMERA
-			m_CameraController->OnUpdate(time);
+			if (ClientData::ViewPortFocused)
+				m_CameraController->OnUpdate(time);
 			// BSE_TRACE("Camera controller updated");
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -122,7 +123,8 @@ public:
 	}
 	
 	void OnEvent(BSE::Event& event) override {
-		m_CameraController->OnEvent(event);
+		if (ClientData::ViewPortFocused)
+			m_CameraController->OnEvent(event);
 	}
 	
 private:
