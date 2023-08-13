@@ -5,11 +5,11 @@
 #define Blazing_Serpent_Engine_Editor_private_rc
 
 /* VERSION DEFINITIONS */
-#define VER_STRING	"1.0.0.26"
+#define VER_STRING	"1.0.0.51"
 #define VER_MAJOR	1
 #define VER_MINOR	0
 #define VER_RELEASE	0
-#define VER_BUILD	26
+#define VER_BUILD	51
 #define COMPANY_NAME	"TOT Creative Labs"
 #define FILE_VERSION	"1.0.0.0"
 #define FILE_DESCRIPTION	"Complex Editor for apps built using Blazing Serpent Engine"
