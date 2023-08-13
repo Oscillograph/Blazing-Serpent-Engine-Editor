@@ -1,7 +1,7 @@
-#ifndef EDITOR_SCENEVIEWER_H
-#define EDITOR_SCENEVIEWER_H
+#ifndef BSEEDITOR_SCENEVIEWER_H
+#define BSEEDITOR_SCENEVIEWER_H
 
-// #include <BSE_Client>
+#include <BSE_Client.h>
 
 class SceneViewer : public BSE::Layer {
 public:
