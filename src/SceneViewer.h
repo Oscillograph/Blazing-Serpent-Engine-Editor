@@ -38,6 +38,29 @@ public:
 		// m_FrameBufferB = BSE::FrameBuffer::Create(fbSpec);
 		BSE::GameData::m_FrameBuffer = m_FrameBufferA;
 		
+		// Scene setup
+		ClientData::m_ActiveScene = new BSE::Scene();
+		
+		ClientData::m_Square = ClientData::m_ActiveScene->CreateEntity("Square");
+		// TODO: find out why SpriteComponent breaks the app
+		ClientData::m_Square->AddComponent<BSE::SpriteComponent>(glm::vec4({1.0f, 0.3f, 0.2f, 1.0f}));
+		if (ClientData::m_Square->HasComponent<BSE::SpriteComponent>())
+			BSE_INFO("Added sprite component");
+		
+		ClientData::m_CameraA = ClientData::m_ActiveScene->CreateEntity("Camera Default");
+		ClientData::m_CameraA->AddComponent<BSE::CameraComponent>();
+		ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().SetCamera(BSE::GameData::m_CameraController->GetCamera());
+		ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera.SetRotation(0.0f);
+		
+		ClientData::m_CameraB = ClientData::m_ActiveScene->CreateEntity("Camera Custom");
+		ClientData::m_CameraB->AddComponent<BSE::CameraComponent>();
+		ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().SetCamera(BSE::GameData::m_CameraController->GetCamera());
+		ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera.SetProjection(-2.0f, 1.0f, 1.0f, -2.0f);
+		ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera.SetRotation(35.0f);
+		
+		// set default camera for the scene and cameracontroller
+		ClientData::m_ActiveScene->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
+		BSE::GameData::m_CameraController->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
 	}
 	
 	void OnDetach() override {
@@ -58,7 +81,7 @@ public:
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// CAMERA
 			if (ClientData::ViewPortFocused)
-				m_CameraController->OnUpdate(time);
+				BSE::GameData::m_CameraController->OnUpdate(time);
 			// BSE_TRACE("Camera controller updated");
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -84,19 +107,27 @@ public:
 			
 			// BSE_TRACE("Window Title changed");
 			BSE::Renderer2D::Clear({0.2f, 0.2f, 0.4f, 1});
-			BSE::Renderer2D::BeginScene(m_CameraController->GetCamera());
+			// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
+			BSE::Renderer2D::BeginScene(BSE::GameData::m_CameraController->GetCamera());
 			
 			for (int x = 0; x < 100; x++){
 				for (int y = 0; y < 100; y++){
 					BSE::Renderer2D::DrawFilledRect(
 						{-1.0f + x*0.06f, -1.0f + y*0.06f}, 
 						{0.05f, 0.05f},
-						// 0.0f + frame * (180 / fps),
-						// {0.2f, 0.7f, 0.3f, 1.0f}
 						BSE::GameData::CustomColor
 						);
 				}
 				// BSE_INFO("x = {0}, y = {1}", x , y);
+			}
+			
+			// m_ActiveScene->OnUpdate(layerTime);
+			auto group = ClientData::m_ActiveScene->Registry().view<BSE::TransformComponent, BSE::SpriteComponent>();
+			for (auto entity : group){
+				auto [transform, sprite] = group.get<BSE::TransformComponent, BSE::SpriteComponent>(entity);
+				// Renderer::Submit(sprite, transform);
+				// TODO: remove temporary usage of renderer
+				BSE::Renderer2D::DrawQuadGeneral(transform.Transform, nullptr, 1.0f, sprite.Color);
 			}
 			
 			BSE::Renderer2D::EndScene();
@@ -124,7 +155,7 @@ public:
 	
 	void OnEvent(BSE::Event& event) override {
 		if (ClientData::ViewPortFocused)
-			m_CameraController->OnEvent(event);
+			BSE::GameData::m_CameraController->OnEvent(event);
 	}
 	
 private:
@@ -133,6 +164,7 @@ private:
 	BSE::Window* m_Window = nullptr;
 	std::string m_Title;
 	BSE::OrthographicCameraController* m_CameraController = nullptr;
+	BSE::OrthographicCamera* m_Camera = nullptr; 
 	
 	BSE::FrameBuffer* m_FrameBufferA;
 	// BSE::FrameBuffer* m_FrameBufferB;

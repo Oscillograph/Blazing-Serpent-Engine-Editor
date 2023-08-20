@@ -96,7 +96,13 @@ public:
 					BSE::GameData::m_CameraController->OnResize(viewportPanelSize.x, viewportPanelSize.y);
 				}
 				// BSE_INFO("Viewport size is: {0}, {1}", viewportPanelSize.x, viewportPanelSize.y);
-				uint32_t sceneTexture = BSE::GameData::m_FrameBuffer->GetColorAttachmentID();
+				uint32_t sceneTexture;
+				if ((0 < viewportPanelSize.x) && (0 < viewportPanelSize.y)){
+					sceneTexture = BSE::GameData::m_FrameBuffer->GetColorAttachmentID();
+				} else {
+					sceneTexture = broTexture->GetID();
+				}
+					
 				ImGui::Image(
 					(void*)sceneTexture, 
 					{m_ViewportSize.x, m_ViewportSize.y},
@@ -111,6 +117,17 @@ public:
 				
 				static char buf[256] = u8"Фыва";
 				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
+		
+				if (ImGui::Button(u8"Камера А")){
+					ClientData::m_ActiveScene->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
+					BSE::GameData::m_CameraController->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
+					BSE_INFO("Camera A activated");
+				}
+				if (ImGui::Button(u8"Камера Б")){
+					ClientData::m_ActiveScene->SetCamera(&(ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera));
+					BSE::GameData::m_CameraController->SetCamera(&(ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera));
+					BSE_INFO("Camera B activated");
+				}
 			ImGui::End();
 		
 		ImGui::End();
