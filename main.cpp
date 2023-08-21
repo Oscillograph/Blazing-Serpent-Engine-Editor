@@ -119,14 +119,16 @@ public:
 				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
 		
 				if (ImGui::Button(u8"Камера А")){
-					ClientData::m_ActiveScene->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
-					BSE::GameData::m_CameraController->SetCamera(&(ClientData::m_CameraA->GetComponent<BSE::CameraComponent>().Camera));
+					ClientData::m_ActiveScene->SetCameraController((ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController));
+					// BSE::GameData::m_CameraController->SetCameraController(&(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController));
 					BSE_INFO("Camera A activated");
 				}
 				if (ImGui::Button(u8"Камера Б")){
-					ClientData::m_ActiveScene->SetCamera(&(ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera));
-					BSE::GameData::m_CameraController->SetCamera(&(ClientData::m_CameraB->GetComponent<BSE::CameraComponent>().Camera));
+					ClientData::m_ActiveScene->SetCameraController((ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
+					BSE_INFO("Is Aspect Ratio constant? {0}", ClientData::m_ActiveScene->GetCameraController()->ToggleConstantAspectRatio());
+					// BSE::GameData::m_CameraController->SetCameraController(&(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
 					BSE_INFO("Camera B activated");
+					BSE_INFO("EXE Adress: {}", fmt::ptr(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
 				}
 			ImGui::End();
 		
