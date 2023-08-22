@@ -84,6 +84,26 @@ public:
 				ImGui::EndMenuBar();
 			}
 		
+			ImGui::Begin(u8"Разные настройки");
+				ImGui::ColorPicker4(u8"Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
+				
+				static char buf[256] = u8"Фыва";
+				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
+				
+				if (ImGui::Button(u8"Камера А")){
+					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
+					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
+					
+					BSE_INFO("Camera A activated");
+				}
+				if (ImGui::Button(u8"Камера Б")){
+					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController);
+					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
+					
+					BSE_INFO("Camera B activated");
+				}
+			ImGui::End();
+		
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::Begin(u8"Сцена");
 				// TODO: AssetManager, GameData storage
@@ -93,7 +113,9 @@ public:
 				if ((m_ViewportSize.x != viewportPanelSize.x) || (m_ViewportSize.y != viewportPanelSize.y)){
 					m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 					BSE::GameData::m_FrameBuffer->Resize(m_ViewportSize);
-					BSE::GameData::m_CameraController->OnResize(viewportPanelSize.x, viewportPanelSize.y);
+					ClientData::m_ActiveScene->GetCameraController()->OnResize(viewportPanelSize.x, viewportPanelSize.y);
+					// ClientData::m_ActiveScene->GetCameraController()->RefreshCamera();
+					// ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 				}
 				// BSE_INFO("Viewport size is: {0}, {1}", viewportPanelSize.x, viewportPanelSize.y);
 				uint32_t sceneTexture;
@@ -111,27 +133,6 @@ public:
 					);
 			ImGui::End();
 			ImGui::PopStyleVar();
-		
-			ImGui::Begin(u8"Разные настройки");
-				ImGui::ColorPicker4(u8"Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
-				
-				static char buf[256] = u8"Фыва";
-				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
-		
-				if (ImGui::Button(u8"Камера А")){
-					ClientData::m_ActiveScene->SetCameraController((ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController));
-					// BSE::GameData::m_CameraController->SetCameraController(&(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController));
-					BSE_INFO("Camera A activated");
-				}
-				if (ImGui::Button(u8"Камера Б")){
-					ClientData::m_ActiveScene->SetCameraController((ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
-					BSE_INFO("Is Aspect Ratio constant? {0}", ClientData::m_ActiveScene->GetCameraController()->ToggleConstantAspectRatio());
-					// BSE::GameData::m_CameraController->SetCameraController(&(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
-					BSE_INFO("Camera B activated");
-					BSE_INFO("EXE Adress: {}", fmt::ptr(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController));
-				}
-			ImGui::End();
-		
 		ImGui::End();
 	}
 	
