@@ -58,6 +58,8 @@ public:
 		
 		// set default camera for the scene and cameracontroller
 		ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
+		
+		ClientData::m_Square->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
 	}
 	
 	void OnDetach() override {
@@ -71,6 +73,9 @@ public:
 		// BSE_TRACE("Layer time counter increased");
 		
 		// --------------------------------------------------
+		// SCENE
+		ClientData::m_ActiveScene->OnUpdate(time);
+		
 		// RENDER
 		if (BSE::RenderCommand::GetAPI() != nullptr){
 			BSE_PROFILE_SCOPE("Sandbox2D OnUpdate");

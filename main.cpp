@@ -2,6 +2,7 @@
 #include <EntryPoint.h>
 
 #include "hacks.h"
+#include "./src/CameraScript.h"
 #include "./src/ClientData.h"
 #include "./src/SceneViewer.h"
 
