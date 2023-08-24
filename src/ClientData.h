@@ -9,4 +9,7 @@ struct ClientData {
 	static BSE::Entity* m_Square;
 	static BSE::Entity* m_CameraA;
 	static BSE::Entity* m_CameraB;
+	
+	static int quadsMaxX;
+	static int quadsMaxY;
 };

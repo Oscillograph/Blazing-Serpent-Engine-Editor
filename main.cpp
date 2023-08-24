@@ -82,28 +82,28 @@ public:
 			
 			if (ImGui::BeginMenuBar())
 			{
-				if (ImGui::BeginMenu(u8"Файл"))
+				if (ImGui::BeginMenu("Файл"))
 				{						
-					if (ImGui::MenuItem(u8"Выход"))
+					if (ImGui::MenuItem("Выход"))
 						BSE::Application::Get()->Close();
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenuBar();
 			}
 		
-			ImGui::Begin(u8"Разные настройки");
-				ImGui::ColorPicker4(u8"Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
+			ImGui::Begin("Разные настройки");
+				ImGui::ColorPicker4("Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
 				
 				// static char buf[256] = u8"Фыва";
 				// ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
 				
-				if (ImGui::Button(u8"Камера А")){
+				if (ImGui::Button("Камера А")){
 					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
 					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 					
 					BSE_INFO("Camera A activated");
 				}
-				if (ImGui::Button(u8"Камера Б")){
+				if (ImGui::Button("Камера Б")){
 					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController);
 					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 					
@@ -111,8 +111,15 @@ public:
 				}
 			ImGui::End();
 		
+			ImGui::Begin("Квадратный фон");
+				ImGui::Text("По горизонтали:");
+				ImGui::DragInt("##maxX", &(ClientData::quadsMaxX), 1);
+				ImGui::Text("По вертикали:");
+				ImGui::DragInt("##maxY", &(ClientData::quadsMaxY), 1);
+			ImGui::End();
+		
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-			ImGui::Begin(u8"Сцена");
+			ImGui::Begin("Сцена");
 				// TODO: AssetManager, GameData storage
 				// ImGui::Image((void*)(BSE::AssetManager->GetTexture(GameData->Textures[0])->GetID()), {1.0f, 1.0f});
 				ClientData::ViewPortFocused = ImGui::IsWindowFocused();

@@ -113,8 +113,8 @@ public:
 			// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
 			BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCameraController()->GetCamera());
 			
-			for (int x = 0; x < 100; x++){
-				for (int y = 0; y < 100; y++){
+			for (int x = 0; x < ClientData::quadsMaxX; x++){
+				for (int y = 0; y < ClientData::quadsMaxY; y++){
 					BSE::Renderer2D::DrawFilledRect(
 						{-1.0f + x*0.06f, -1.0f + y*0.06f}, 
 						{0.05f, 0.05f},
