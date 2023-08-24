@@ -6,11 +6,17 @@
 #include "./src/ClientData.h"
 #include "./src/SceneViewer.h"
 
+// Panels
+#include "./src/Panels/SceneHierarchyPanel.h"
+
 class EditorGuiLayer : public BSE::ImGuiLayer {
 public:
 	EditorGuiLayer() {
 		broTexture = BSE::Texture2D::Create("./assets/img/broscillograph.png");
 		broTexture->Bind();
+		
+		// Panels setup
+		m_Panel = new BSE::SceneHierarchyPanel();
 	}
 	
 	~EditorGuiLayer() {
@@ -88,8 +94,8 @@ public:
 			ImGui::Begin(u8"Разные настройки");
 				ImGui::ColorPicker4(u8"Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
 				
-				static char buf[256] = u8"Фыва";
-				ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
+				// static char buf[256] = u8"Фыва";
+				// ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
 				
 				if (ImGui::Button(u8"Камера А")){
 					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
@@ -134,6 +140,9 @@ public:
 					);
 			ImGui::End();
 			ImGui::PopStyleVar();
+		
+			m_Panel->SetContext(ClientData::m_ActiveScene);
+			m_Panel->OnImGuiRender();
 		ImGui::End();
 	}
 	
@@ -141,6 +150,9 @@ private:
 	float layerTime = 0.0f;
 	glm::vec2 m_ViewportSize = {600.0f, 400.0f};
 	BSE::Texture2D* broTexture;
+	
+	// Panels
+	BSE::SceneHierarchyPanel* m_Panel = nullptr; 
 };
 
 class Editor : public BSE::Application {

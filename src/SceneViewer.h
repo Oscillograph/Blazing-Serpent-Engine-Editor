@@ -45,12 +45,14 @@ public:
 		
 		// TODO: find out why SpriteComponent breaks the app
 		ClientData::m_Square->AddComponent<BSE::SpriteComponent>(glm::vec4({1.0f, 0.3f, 0.2f, 1.0f}));
+		ClientData::m_Square->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
 		if (ClientData::m_Square->HasComponent<BSE::SpriteComponent>())
 			BSE_INFO("Added sprite component");
 		
 		ClientData::m_CameraA = ClientData::m_ActiveScene->CreateEntity("Camera Default");
 		ClientData::m_CameraA->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, false, false);
 		ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController->Rotate(0.0f);
+		// ClientData::m_CameraA->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
 		
 		ClientData::m_CameraB = ClientData::m_ActiveScene->CreateEntity("Camera Custom");
 		ClientData::m_CameraB->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, true, true);
@@ -58,8 +60,6 @@ public:
 		
 		// set default camera for the scene and cameracontroller
 		ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
-		
-		ClientData::m_Square->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
 	}
 	
 	void OnDetach() override {
