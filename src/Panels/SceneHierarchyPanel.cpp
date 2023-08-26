@@ -89,13 +89,70 @@ namespace BSE {
 		if (entity.HasComponent<CameraControllerComponent>()){
 			if (ImGui::TreeNodeEx((void*)typeid(CameraControllerComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera Controller")) {
 				auto& cameraController = m_Context->Registry().get<CameraControllerComponent>(entity.GetID()).CameraController;
-				glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
-				if (ImGui::DragFloat3("Поворот", glm::value_ptr(rotation), 0.1f)){
-					cameraController->Rotate(rotation);
+				
+				const char* projectionTypeStrings[] = {
+					"Перспектива",
+					"Ортография"
+				};
+				const char* currentProjectionTypeString = projectionTypeStrings[(int)cameraController->GetProjectionType()];
+				if (ImGui::BeginCombo("Тип проекции", currentProjectionTypeString)){
+					for (int i = 0; i < 2; i++){
+						bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+						if (ImGui::Selectable(projectionTypeStrings[i], isSelected)){
+							currentProjectionTypeString = projectionTypeStrings[i];
+							cameraController->SetProjectionType((CameraProjectionType)i);
+							cameraController->RefreshCamera();
+						}
+						
+						if (isSelected){
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
 				}
-				glm::vec3 position = cameraController->GetCamera()->GetPosition();
-				if (ImGui::DragFloat3("Положение", glm::value_ptr(position), 0.1f)){
-					cameraController->GetCamera()->SetPosition(position);
+				
+				if (cameraController->GetProjectionType() == CameraProjectionType::Perspective){
+					glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
+					if (ImGui::DragFloat3("Поворот", glm::value_ptr(rotation), 0.1f)){
+						cameraController->Rotate(rotation);
+					}
+					
+					glm::vec3 position = cameraController->GetCamera()->GetPosition();
+					if (ImGui::DragFloat3("Положение", glm::value_ptr(position), 0.1f)){
+						cameraController->GetCamera()->SetPosition(position);
+						cameraController->SetProjectionDefault();
+					}
+					
+					float fov = cameraController->GetPerspectiveVerticalFOV();
+					if (ImGui::DragFloat("FOV", &fov, 0.1f)){
+						cameraController->SetPerspectiveVerticalFOV(fov);
+					}
+					
+					float zNear = cameraController->GetPerspectiveNear();
+					if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
+						cameraController->SetPerspectiveNear(zNear);
+					}
+					
+					float zFar = cameraController->GetPerspectiveFar();
+					if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
+						cameraController->SetPerspectiveFar(zFar);
+					}
+				}
+				
+				if (cameraController->GetProjectionType() == CameraProjectionType::Orthographic){
+					float zoomlevel = cameraController->GetZoomLevel();
+					if (ImGui::DragFloat("Размер", &zoomlevel, 0.1f)){
+						cameraController->SetZoomLevel(zoomlevel);
+					}
+					float zNear = cameraController->GetOrthographicZNear();
+					if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
+						cameraController->SetOrthographicZNear(zNear);
+					}
+					
+					float zFar = cameraController->GetOrthographicZFar();
+					if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
+						cameraController->SetOrthographicZFar(zFar);
+					}
 				}
 				ImGui::TreePop();
 			}
