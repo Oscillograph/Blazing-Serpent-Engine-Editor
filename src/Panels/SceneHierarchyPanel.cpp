@@ -1,4 +1,5 @@
 #include "./SceneHierarchyPanel.h"
+#include <BSE_Client.h> // just to make RedPanda C++ parse well the code below
 
 namespace BSE {
 	SceneHierarchyPanel::SceneHierarchyPanel(Scene* scene){
@@ -77,9 +78,16 @@ namespace BSE {
 		});
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
-			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID()).Transform;
+			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID());
+			char buffer[256]; 
+			sprintf(buffer, "Позиция##%d", (int)entity.GetID());
+			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Translation), 0.1f);
 			
-			ImGui::DragFloat3("Позиция", glm::value_ptr(transform[3]), 0.5f);
+			sprintf(buffer, "Поворот##%d", (int)entity.GetID());
+			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Rotation), 0.1f);
+			
+			sprintf(buffer, "Размер##%d", (int)entity.GetID());
+			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Scale), 0.1f);
 		});
 		
 		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });

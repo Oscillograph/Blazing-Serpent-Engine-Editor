@@ -133,7 +133,7 @@ public:
 					auto [transform, sprite] = group.get<BSE::TransformComponent, BSE::SpriteComponent>(entity);
 					// Renderer::Submit(sprite, transform);
 					// TODO: remove temporary usage of renderer
-					BSE::Renderer2D::DrawQuadGeneral(transform.Transform, nullptr, 1.0f, sprite.Color);
+					BSE::Renderer2D::DrawQuadGeneral(transform.GetTransform(), nullptr, 1.0f, sprite.Color);
 				}
 				
 				BSE::Renderer2D::EndScene();
