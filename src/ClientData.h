@@ -1,3 +1,6 @@
+#ifndef BSEEDITOR_CLIENTDATA_H
+#define BSEEDITOR_CLIENTDATA_H
+
 #include <BSE_Client.h>
 
 struct ClientData {
@@ -13,3 +16,5 @@ struct ClientData {
 	static int quadsMaxX;
 	static int quadsMaxY;
 };
+
+#endif

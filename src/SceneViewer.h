@@ -1,7 +1,8 @@
 #ifndef BSEEDITOR_SCENEVIEWER_H
 #define BSEEDITOR_SCENEVIEWER_H
 
-// #include <BSE_Client.h>
+#include <BSE_Client.h>
+#include "./ClientData.h"
 
 class SceneViewer : public BSE::Layer {
 public:
@@ -110,30 +111,33 @@ public:
 			
 			// BSE_TRACE("Window Title changed");
 			BSE::Renderer2D::Clear({0.2f, 0.2f, 0.4f, 1});
-			// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
-			BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCameraController()->GetCamera());
 			
-			for (int x = 0; x < ClientData::quadsMaxX; x++){
-				for (int y = 0; y < ClientData::quadsMaxY; y++){
-					BSE::Renderer2D::DrawFilledRect(
-						{-1.0f + x*0.06f, -1.0f + y*0.06f}, 
-						{0.05f, 0.05f},
-						BSE::GameData::CustomColor
-						);
+			if (ClientData::m_ActiveScene->GetCameraController() != nullptr){
+				// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
+				BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCameraController()->GetCamera());
+				
+				for (int x = 0; x < ClientData::quadsMaxX; x++){
+					for (int y = 0; y < ClientData::quadsMaxY; y++){
+						BSE::Renderer2D::DrawFilledRect(
+							{-1.0f + x*0.06f, -1.0f + y*0.06f}, 
+							{0.05f, 0.05f},
+							BSE::GameData::CustomColor
+							);
+					}
+					// BSE_INFO("x = {0}, y = {1}", x , y);
 				}
-				// BSE_INFO("x = {0}, y = {1}", x , y);
+				
+				// m_ActiveScene->OnUpdate(layerTime);
+				auto group = ClientData::m_ActiveScene->Registry().view<BSE::TransformComponent, BSE::SpriteComponent>();
+				for (auto entity : group){
+					auto [transform, sprite] = group.get<BSE::TransformComponent, BSE::SpriteComponent>(entity);
+					// Renderer::Submit(sprite, transform);
+					// TODO: remove temporary usage of renderer
+					BSE::Renderer2D::DrawQuadGeneral(transform.Transform, nullptr, 1.0f, sprite.Color);
+				}
+				
+				BSE::Renderer2D::EndScene();
 			}
-			
-			// m_ActiveScene->OnUpdate(layerTime);
-			auto group = ClientData::m_ActiveScene->Registry().view<BSE::TransformComponent, BSE::SpriteComponent>();
-			for (auto entity : group){
-				auto [transform, sprite] = group.get<BSE::TransformComponent, BSE::SpriteComponent>(entity);
-				// Renderer::Submit(sprite, transform);
-				// TODO: remove temporary usage of renderer
-				BSE::Renderer2D::DrawQuadGeneral(transform.Transform, nullptr, 1.0f, sprite.Color);
-			}
-			
-			BSE::Renderer2D::EndScene();
 			
 			// Unbind current buffer
 			{

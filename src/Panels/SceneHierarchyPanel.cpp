@@ -56,106 +56,117 @@ namespace BSE {
 		}
 	}
 	
+	template <typename Component>
+	void SceneHierarchyPanel::DrawComponent(const char* label, Entity& entity, VoidFn func){
+		if (entity.HasComponent<Component>()){
+			if (ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, label)) {
+				func(entity);
+				ImGui::TreePop();
+			}
+		}
+	}
+	
 	void SceneHierarchyPanel::DrawComponents(Entity& entity){
 		// BSE_INFO("Inspecting Entity id: {0}", (uint32_t)entity.GetID());
-		if (entity.HasComponent<NameComponent>()){
-			if (ImGui::TreeNodeEx((void*)typeid(NameComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Name")) {
-				auto& name = m_Context->Registry().get<NameComponent>(entity.GetID()).Name;
-				static char nameBuffer[256];
-				memset(nameBuffer, 0, sizeof(nameBuffer));
-				strcpy_s(nameBuffer, sizeof(nameBuffer), name.c_str());
-				
-				if (ImGui::InputText("Имя", nameBuffer, sizeof(nameBuffer))){
-					name = std::string(nameBuffer);
-				}
-				ImGui::TreePop();
+		DrawComponent<NameComponent>("Name", entity, [this](Entity& entity){
+			auto& name = m_Context->Registry().get<NameComponent>(entity.GetID()).Name;
+			if (ImGui::InputText("Имя", &name)){
+				// somefin if needed
 			}
-		}
+		});
 		
-		if (entity.HasComponent<TransformComponent>()){
-			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform")) {
-				auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID()).Transform;
-				if (ImGui::DragFloat3("Позиция", glm::value_ptr(transform[3]), 0.5f)){
-					// somefin if needed
-				}
-				ImGui::TreePop();
+		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
+			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID()).Transform;
+			if (ImGui::DragFloat3("Позиция", glm::value_ptr(transform[3]), 0.5f)){
+				// somefin if needed
 			}
-		}
+		});
 		
-		if (entity.HasComponent<NativeScriptComponent>()){
-			
-		}
+		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });
 
-		if (entity.HasComponent<CameraControllerComponent>()){
-			if (ImGui::TreeNodeEx((void*)typeid(CameraControllerComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Camera Controller")) {
-				auto& cameraController = m_Context->Registry().get<CameraControllerComponent>(entity.GetID()).CameraController;
-				
-				const char* projectionTypeStrings[] = {
-					"Перспектива",
-					"Ортография"
-				};
-				const char* currentProjectionTypeString = projectionTypeStrings[(int)cameraController->GetProjectionType()];
-				if (ImGui::BeginCombo("Тип проекции", currentProjectionTypeString)){
-					for (int i = 0; i < 2; i++){
-						bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-						if (ImGui::Selectable(projectionTypeStrings[i], isSelected)){
-							currentProjectionTypeString = projectionTypeStrings[i];
-							cameraController->SetProjectionType((CameraProjectionType)i);
-							cameraController->RefreshCamera();
-						}
-						
-						if (isSelected){
-							ImGui::SetItemDefaultFocus();
-						}
-					}
-					ImGui::EndCombo();
+		
+		DrawComponent<CameraControllerComponent>("Camera Controller", entity, [this](Entity& entity){
+			auto& cameraController = m_Context->Registry().get<CameraControllerComponent>(entity.GetID()).CameraController;
+			
+			if (ClientData::m_ActiveScene->GetCameraController() == cameraController){
+				if (ImGui::Button("Отвязать от сцены##cameraComponent")){
+					ClientData::m_ActiveScene->SetCameraController(nullptr);
 				}
-				
-				if (cameraController->GetProjectionType() == CameraProjectionType::Perspective){
-					glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
-					if (ImGui::DragFloat3("Поворот", glm::value_ptr(rotation), 0.1f)){
-						cameraController->Rotate(rotation);
-					}
-					
-					glm::vec3 position = cameraController->GetCamera()->GetPosition();
-					if (ImGui::DragFloat3("Положение", glm::value_ptr(position), 0.1f)){
-						cameraController->GetCamera()->SetPosition(position);
-						cameraController->SetProjectionDefault();
-					}
-					
-					float fov = cameraController->GetPerspectiveVerticalFOV();
-					if (ImGui::DragFloat("FOV", &fov, 0.1f)){
-						cameraController->SetPerspectiveVerticalFOV(fov);
-					}
-					
-					float zNear = cameraController->GetPerspectiveNear();
-					if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
-						cameraController->SetPerspectiveNear(zNear);
-					}
-					
-					float zFar = cameraController->GetPerspectiveFar();
-					if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
-						cameraController->SetPerspectiveFar(zFar);
-					}
+			} else {
+				if (ImGui::Button("Привязать к сцене##cameraComponent")){
+					ClientData::m_ActiveScene->SetCameraController(cameraController);
 				}
-				
-				if (cameraController->GetProjectionType() == CameraProjectionType::Orthographic){
-					float zoomlevel = cameraController->GetZoomLevel();
-					if (ImGui::DragFloat("Размер", &zoomlevel, 0.1f)){
-						cameraController->SetZoomLevel(zoomlevel);
-					}
-					float zNear = cameraController->GetOrthographicZNear();
-					if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
-						cameraController->SetOrthographicZNear(zNear);
-					}
-					
-					float zFar = cameraController->GetOrthographicZFar();
-					if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
-						cameraController->SetOrthographicZFar(zFar);
-					}
-				}
-				ImGui::TreePop();
 			}
-		}
+			
+			const char* projectionTypeStrings[] = {
+				"Перспектива",
+				"Ортография"
+			};
+			const char* currentProjectionTypeString = projectionTypeStrings[(int)cameraController->GetProjectionType()];
+			if (ImGui::BeginCombo("Тип проекции", currentProjectionTypeString)){
+				for (int i = 0; i < 2; i++){
+					bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+					if (ImGui::Selectable(projectionTypeStrings[i], isSelected)){
+						currentProjectionTypeString = projectionTypeStrings[i];
+						cameraController->SetProjectionType((CameraProjectionType)i);
+						cameraController->RefreshCamera();
+					}
+					
+					if (isSelected){
+						ImGui::SetItemDefaultFocus();
+					}
+				}
+				ImGui::EndCombo();
+			}
+			
+			if (cameraController->GetProjectionType() == CameraProjectionType::Perspective){
+				glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
+				if (ImGui::DragFloat3("Поворот", glm::value_ptr(rotation), 0.1f)){
+					cameraController->Rotate(rotation);
+				}
+				
+				glm::vec3 position = cameraController->GetCamera()->GetPosition();
+				if (ImGui::DragFloat3("Положение", glm::value_ptr(position), 0.1f)){
+					cameraController->GetCamera()->SetPosition(position);
+					cameraController->SetProjectionDefault();
+				}
+				
+				float fov = cameraController->GetPerspectiveVerticalFOV();
+				if (ImGui::DragFloat("FOV", &fov, 0.1f)){
+					cameraController->SetPerspectiveVerticalFOV(fov);
+				}
+				
+				float zNear = cameraController->GetPerspectiveNear();
+				if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
+					cameraController->SetPerspectiveNear(zNear);
+				}
+				
+				float zFar = cameraController->GetPerspectiveFar();
+				if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
+					cameraController->SetPerspectiveFar(zFar);
+				}
+			}
+			
+			if (cameraController->GetProjectionType() == CameraProjectionType::Orthographic){
+				float zoomlevel = cameraController->GetZoomLevel();
+				if (ImGui::DragFloat("Размер", &zoomlevel, 0.1f)){
+					cameraController->SetZoomLevel(zoomlevel);
+				}
+				float zNear = cameraController->GetOrthographicZNear();
+				if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
+					cameraController->SetOrthographicZNear(zNear);
+				}
+				
+				float zFar = cameraController->GetOrthographicZFar();
+				if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
+					cameraController->SetOrthographicZFar(zFar);
+				}
+			}
+		});
+		
+		DrawComponent<SpriteComponent>("Sprite", entity, [this](Entity& entity){
+			auto& color = m_Context->Registry().get<SpriteComponent>(entity.GetID()).Color;
+			ImGui::ColorEdit4("Цвет", glm::value_ptr(color));
+		});
 	}
 }

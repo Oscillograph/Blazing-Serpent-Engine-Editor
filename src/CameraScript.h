@@ -1,6 +1,8 @@
 #ifndef BSE_EDITOR_CAMERASCRIPT_H
 #define BSE_EDITOR_CAMERASCRIPT_H
 
+#include <BSE_Client.h>
+
 class CameraScript : public BSE::ScriptableEntity {
 public:
 	void OnCreate(){}
