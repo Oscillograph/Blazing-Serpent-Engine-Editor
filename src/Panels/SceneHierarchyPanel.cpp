@@ -46,9 +46,10 @@ namespace BSE {
 			// BSE_INFO("Clicked Entity id: {0}", (uint32_t)entity.GetID());
 		}
 		
+		// for child entities to be implemented in future
 		if (opened){
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-			bool opened = ImGui::TreeNodeEx((void*)((uint32_t)entity.GetID() + 1000), flags, name.c_str());
+			bool opened = ImGui::TreeNodeEx((void*)((uint32_t)entity.GetID() + 10000), flags, name.c_str());
 			if (opened){
 				ImGui::TreePop();
 			}
@@ -70,16 +71,15 @@ namespace BSE {
 		// BSE_INFO("Inspecting Entity id: {0}", (uint32_t)entity.GetID());
 		DrawComponent<NameComponent>("Name", entity, [this](Entity& entity){
 			auto& name = m_Context->Registry().get<NameComponent>(entity.GetID()).Name;
-			if (ImGui::InputText("Имя", &name)){
-				// somefin if needed
-			}
+			char buffer[256]; 
+			sprintf(buffer, "Имя##%d", (int)entity.GetID());
+			ImGui::InputText(buffer, &name);
 		});
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
 			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID()).Transform;
-			if (ImGui::DragFloat3("Позиция", glm::value_ptr(transform[3]), 0.5f)){
-				// somefin if needed
-			}
+			
+			ImGui::DragFloat3("Позиция", glm::value_ptr(transform[3]), 0.5f);
 		});
 		
 		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });
@@ -166,6 +166,7 @@ namespace BSE {
 		
 		DrawComponent<SpriteComponent>("Sprite", entity, [this](Entity& entity){
 			auto& color = m_Context->Registry().get<SpriteComponent>(entity.GetID()).Color;
+			
 			ImGui::ColorEdit4("Цвет", glm::value_ptr(color));
 		});
 	}
