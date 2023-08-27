@@ -1,5 +1,6 @@
 #include "./SceneHierarchyPanel.h"
 #include <BSE_Client.h> // just to make RedPanda C++ parse well the code below
+#include <BSE/vendor/imgui/imgui_internal.h>
 
 namespace BSE {
 	SceneHierarchyPanel::SceneHierarchyPanel(Scene* scene){
@@ -68,6 +69,67 @@ namespace BSE {
 		}
 	}
 	
+	void SceneHierarchyPanel::DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth){
+		ImGuiContext* GImGui = ImGui::GetCurrentContext();
+		char buffer[256]; 
+		
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+		
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
+		
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+		
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.3f, 0.15f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.6f, 0.4f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{1.0f, 0.7f, 0.7f, 1.0f});
+		sprintf(buffer, "x##x%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize))
+			values.x = resetValue;
+		ImGui::SameLine();
+		sprintf(buffer, "##x%s", label.c_str());
+		ImGui::DragFloat(buffer, &values.x, 0.1f);
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		ImGui::PopStyleColor(3);
+		
+		
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3f, 0.8f, 0.15f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.6f, 0.8f, 0.4f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 1.0f, 0.7f, 1.0f});
+		sprintf(buffer, "y##x%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize))
+			values.y = resetValue;
+		ImGui::SameLine();
+		sprintf(buffer, "##y%s", label.c_str());
+		ImGui::DragFloat(buffer, &values.y, 0.1f);
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		ImGui::PopStyleColor(3);
+		
+		
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.3f, 0.8f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.4f, 0.6f, 0.8f, 1.0f});
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 1.0f, 1.0f});
+		sprintf(buffer, "z##x%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize))
+			values.z = resetValue;
+		ImGui::SameLine();
+		sprintf(buffer, "##z%s", label.c_str());
+		ImGui::DragFloat(buffer, &values.z, 0.1f);
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+		ImGui::PopStyleColor(3);
+		
+		ImGui::PopStyleVar();
+		
+		ImGui::Columns(1);
+	}
+	
 	void SceneHierarchyPanel::DrawComponents(Entity& entity){
 		// BSE_INFO("Inspecting Entity id: {0}", (uint32_t)entity.GetID());
 		DrawComponent<NameComponent>("Name", entity, [this](Entity& entity){
@@ -79,15 +141,20 @@ namespace BSE {
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
 			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID());
-			char buffer[256]; 
-			sprintf(buffer, "Позиция##%d", (int)entity.GetID());
-			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Translation), 0.1f);
+			// char buffer[256]; 
+			// sprintf(buffer, "Позиция##%d", (int)entity.GetID());
+			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Translation), 0.1f);
+			DrawVec3Control("Позиция", transform.Translation);
+			glm::vec3 rotation = glm::degrees(transform.Rotation);
+			DrawVec3Control("Поворот", rotation);
+			transform.Rotation = glm::radians(rotation);
+			DrawVec3Control("Размер", transform.Scale, 1.0f);
 			
-			sprintf(buffer, "Поворот##%d", (int)entity.GetID());
-			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Rotation), 0.1f);
+			// sprintf(buffer, "Поворот##%d", (int)entity.GetID());
+			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Rotation), 0.1f);
 			
-			sprintf(buffer, "Размер##%d", (int)entity.GetID());
-			ImGui::DragFloat3(buffer, glm::value_ptr(transform.Scale), 0.1f);
+			// sprintf(buffer, "Размер##%d", (int)entity.GetID());
+			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Scale), 0.1f);
 		});
 		
 		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });

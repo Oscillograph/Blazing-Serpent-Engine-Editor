@@ -18,7 +18,7 @@ namespace BSE {
 
 		template <typename Component>
 		void DrawComponent(const char* label, Entity& entity, VoidFn func);
-		
+		void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
 		void DrawComponents(Entity& entity);
 	protected:
 		void DrawEntityNode(Entity& entity);
