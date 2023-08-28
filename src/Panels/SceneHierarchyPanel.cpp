@@ -1,6 +1,6 @@
 #include "./SceneHierarchyPanel.h"
-#include <BSE_Client.h> // just to make RedPanda C++ parse well the code below
-#include <BSE/vendor/imgui/imgui_internal.h>
+// #include <BSE_Client.h> // just to make RedPanda C++ parse well the code below
+// #include <BSE/vendor/imgui/imgui_internal.h>
 
 namespace BSE {
 	SceneHierarchyPanel::SceneHierarchyPanel(Scene* scene){
@@ -26,11 +26,35 @@ namespace BSE {
 		 	m_SelectionContext = {};
 			m_SelectedEntity = false;
 		}
+		
+		// Opens if RMB clicked on empty space
+		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems)){
+			if (ImGui::MenuItem("Создать сущность")){
+				m_Context->CreateEntity("Новая сущность");
+			}
+			ImGui::EndPopup();
+		}
 		ImGui::End();
 		
-		ImGui::Begin("Свойства");
+		ImGui::Begin("Компоненты");
 		if (m_SelectedEntity){
 			DrawComponents(m_SelectionContext);
+			
+			if (ImGui::Button("Новый компонент")){
+				ImGui::OpenPopup("Add component");
+			}
+			
+			if (ImGui::BeginPopup("Add component")){
+				if (ImGui::MenuItem("Камера")){
+					m_SelectionContext.AddComponent<CameraControllerComponent>(1.0f, 1.0f, true, true);
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Спрайт")){
+					m_SelectionContext.AddComponent<SpriteComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
 		}
 		ImGui::End();
 	}
@@ -41,6 +65,7 @@ namespace BSE {
 		
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity.GetID(), flags, name.c_str());
+		bool deleted = false;
 		
 		if (ImGui::IsItemClicked()){
 			m_SelectedEntity = true;
@@ -48,8 +73,19 @@ namespace BSE {
 			// BSE_INFO("Clicked Entity id: {0}", (uint32_t)entity.GetID());
 		}
 		
+		// Opens on RMB clicked
+		if (ImGui::BeginPopupContextItem(0, ImGuiPopupFlags_MouseButtonRight)){
+			if (ImGui::MenuItem("Удалить сущность")){
+				m_Context->DestroyEntity(entity);
+				deleted = true;
+				m_SelectionContext = {};
+				m_SelectedEntity = false;
+			}
+			ImGui::EndPopup();
+		}
+		
 		// for child entities to be implemented in future
-		if (opened){
+		if (opened && !deleted){
 			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
 			bool opened = ImGui::TreeNodeEx((void*)((uint32_t)entity.GetID() + 10000), flags, name.c_str());
 			if (opened){
@@ -60,10 +96,37 @@ namespace BSE {
 	}
 	
 	template <typename Component>
-	void SceneHierarchyPanel::DrawComponent(const char* label, Entity& entity, VoidFn func){
+	void SceneHierarchyPanel::DrawComponent(const char* label, Entity& entity, VoidFn func, bool canBeDeleted){
+		ImGuiTreeNodeFlags treeNodeFlags = 
+			ImGuiTreeNodeFlags_DefaultOpen | 
+			ImGuiTreeNodeFlags_AllowItemOverlap;
+		
 		if (entity.HasComponent<Component>()){
-			if (ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, label)) {
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+			bool open = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), treeNodeFlags, label);
+			
+			bool removeComponent = false;
+			if (canBeDeleted){
+				ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
+				if (ImGui::Button("+", ImVec2(20.0f, 20.0f))){
+					ImGui::OpenPopup("Component settings");
+				}
+				
+				if (ImGui::BeginPopup("Component settings")){
+					if (ImGui::MenuItem("Удалить компонент"))
+						removeComponent = true;
+					
+					ImGui::EndPopup();
+				}
+			}
+			ImGui::PopStyleVar();
+			
+			if (open) {
 				func(entity);
+				
+				if (removeComponent)
+					entity.RemoveComponent<Component>();
+				
 				ImGui::TreePop();
 			}
 		}
@@ -94,9 +157,8 @@ namespace BSE {
 		sprintf(buffer, "##x%s", label.c_str());
 		ImGui::DragFloat(buffer, &values.x, 0.1f);
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
 		ImGui::PopStyleColor(3);
-		
+		ImGui::SameLine();
 		
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3f, 0.8f, 0.15f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.6f, 0.8f, 0.4f, 1.0f});
@@ -108,8 +170,8 @@ namespace BSE {
 		sprintf(buffer, "##y%s", label.c_str());
 		ImGui::DragFloat(buffer, &values.y, 0.1f);
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
 		ImGui::PopStyleColor(3);
+		ImGui::SameLine();
 		
 		
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.3f, 0.8f, 1.0f});
@@ -122,11 +184,9 @@ namespace BSE {
 		sprintf(buffer, "##z%s", label.c_str());
 		ImGui::DragFloat(buffer, &values.z, 0.1f);
 		ImGui::PopItemWidth();
-		ImGui::SameLine();
+		// ImGui::SameLine();
 		ImGui::PopStyleColor(3);
-		
 		ImGui::PopStyleVar();
-		
 		ImGui::Columns(1);
 	}
 	
@@ -137,10 +197,11 @@ namespace BSE {
 			char buffer[256]; 
 			sprintf(buffer, "Имя##%d", (int)entity.GetID());
 			ImGui::InputText(buffer, &name);
-		});
+		}, false);
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
 			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID());
+			
 			// char buffer[256]; 
 			// sprintf(buffer, "Позиция##%d", (int)entity.GetID());
 			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Translation), 0.1f);
@@ -155,7 +216,7 @@ namespace BSE {
 			
 			// sprintf(buffer, "Размер##%d", (int)entity.GetID());
 			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Scale), 0.1f);
-		});
+		}, false);
 		
 		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });
 
