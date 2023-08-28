@@ -8,6 +8,7 @@
 namespace BSE {
 	class SceneHierarchyPanel {
 		using VoidFn = std::function<void(Entity& entity)>;
+		using EmptyFn = std::function<void()>;
 	public:
 		SceneHierarchyPanel() = default;
 		SceneHierarchyPanel(Scene* scene);
@@ -18,7 +19,11 @@ namespace BSE {
 
 		template <typename Component>
 		void DrawComponent(const char* label, Entity& entity, VoidFn func, bool canBeDeleted = true);
-		void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
+		void DrawVec3Control(	const std::string& label, 
+								glm::vec3& values, 
+								EmptyFn func = [](){}, 
+								float resetValue = 0.0f, 
+								float columnWidth = 100.0f);
 		void DrawComponents(Entity& entity);
 	protected:
 		void DrawEntityNode(Entity& entity);

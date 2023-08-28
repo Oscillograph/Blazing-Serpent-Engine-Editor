@@ -66,6 +66,9 @@ public:
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		
 		ImGui::Begin("DockSpace Demo", &dockspace_open, window_flags);
+			// m_FontDefault->Scale = 2.0f;
+			ImGui::PushFont(m_FontDefault);
+		
 			if (!opt_padding)
 				ImGui::PopStyleVar();
 			
@@ -150,6 +153,8 @@ public:
 		
 			m_Panel->SetContext(ClientData::m_ActiveScene);
 			m_Panel->OnImGuiRender();
+		
+			ImGui::PopFont();
 		ImGui::End();
 	}
 	

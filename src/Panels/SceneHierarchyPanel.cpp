@@ -39,22 +39,6 @@ namespace BSE {
 		ImGui::Begin("Компоненты");
 		if (m_SelectedEntity){
 			DrawComponents(m_SelectionContext);
-			
-			if (ImGui::Button("Новый компонент")){
-				ImGui::OpenPopup("Add component");
-			}
-			
-			if (ImGui::BeginPopup("Add component")){
-				if (ImGui::MenuItem("Камера")){
-					m_SelectionContext.AddComponent<CameraControllerComponent>(1.0f, 1.0f, true, true);
-					ImGui::CloseCurrentPopup();
-				}
-				if (ImGui::MenuItem("Спрайт")){
-					m_SelectionContext.AddComponent<SpriteComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-				ImGui::EndPopup();
-			}
 		}
 		ImGui::End();
 	}
@@ -64,6 +48,7 @@ namespace BSE {
 		// ImGui::Text("%s", name.c_str());
 		
 		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
 		bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity.GetID(), flags, name.c_str());
 		bool deleted = false;
 		
@@ -86,7 +71,7 @@ namespace BSE {
 		
 		// for child entities to be implemented in future
 		if (opened && !deleted){
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 			bool opened = ImGui::TreeNodeEx((void*)((uint32_t)entity.GetID() + 10000), flags, name.c_str());
 			if (opened){
 				ImGui::TreePop();
@@ -98,17 +83,23 @@ namespace BSE {
 	template <typename Component>
 	void SceneHierarchyPanel::DrawComponent(const char* label, Entity& entity, VoidFn func, bool canBeDeleted){
 		ImGuiTreeNodeFlags treeNodeFlags = 
-			ImGuiTreeNodeFlags_DefaultOpen | 
-			ImGuiTreeNodeFlags_AllowItemOverlap;
+			ImGuiTreeNodeFlags_DefaultOpen |
+			ImGuiTreeNodeFlags_Framed |
+			ImGuiTreeNodeFlags_AllowItemOverlap |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
 		
 		if (entity.HasComponent<Component>()){
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{4, 4});
+			ImVec2 contentRegionAvailiable = ImGui::GetContentRegionAvail();
+			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			ImGui::Separator();
+			
 			bool open = ImGui::TreeNodeEx((void*)typeid(Component).hash_code(), treeNodeFlags, label);
 			
 			bool removeComponent = false;
 			if (canBeDeleted){
-				ImGui::SameLine(ImGui::GetWindowWidth() - 25.0f);
-				if (ImGui::Button("+", ImVec2(20.0f, 20.0f))){
+				ImGui::SameLine(contentRegionAvailiable.x - lineHeight * 0.5f - 25.0f);
+				if (ImGui::Button("...", ImVec2(lineHeight, lineHeight))){
 					ImGui::OpenPopup("Component settings");
 				}
 				
@@ -132,7 +123,7 @@ namespace BSE {
 		}
 	}
 	
-	void SceneHierarchyPanel::DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue, float columnWidth){
+	void SceneHierarchyPanel::DrawVec3Control(const std::string& label, glm::vec3& values, EmptyFn func, float resetValue, float columnWidth){
 		ImGuiContext* GImGui = ImGui::GetCurrentContext();
 		char buffer[256]; 
 		
@@ -150,12 +141,16 @@ namespace BSE {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.3f, 0.15f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.6f, 0.4f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{1.0f, 0.7f, 0.7f, 1.0f});
-		sprintf(buffer, "x##x%s", label.c_str());
-		if (ImGui::Button(buffer, buttonSize))
+		sprintf(buffer, "X##x%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize)){
 			values.x = resetValue;
+			func();
+		}
 		ImGui::SameLine();
 		sprintf(buffer, "##x%s", label.c_str());
-		ImGui::DragFloat(buffer, &values.x, 0.1f);
+		if (ImGui::DragFloat(buffer, &values.x, 0.1f)){
+			func();
+		}
 		ImGui::PopItemWidth();
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine();
@@ -163,12 +158,16 @@ namespace BSE {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3f, 0.8f, 0.15f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.6f, 0.8f, 0.4f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 1.0f, 0.7f, 1.0f});
-		sprintf(buffer, "y##x%s", label.c_str());
-		if (ImGui::Button(buffer, buttonSize))
+		sprintf(buffer, "Y##y%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize)){
 			values.y = resetValue;
+			func();
+		}
 		ImGui::SameLine();
 		sprintf(buffer, "##y%s", label.c_str());
-		ImGui::DragFloat(buffer, &values.y, 0.1f);
+		if (ImGui::DragFloat(buffer, &values.y, 0.1f)){
+			func();
+		}
 		ImGui::PopItemWidth();
 		ImGui::PopStyleColor(3);
 		ImGui::SameLine();
@@ -177,12 +176,16 @@ namespace BSE {
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.3f, 0.8f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.4f, 0.6f, 0.8f, 1.0f});
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 1.0f, 1.0f});
-		sprintf(buffer, "z##x%s", label.c_str());
-		if (ImGui::Button(buffer, buttonSize))
+		sprintf(buffer, "Z##z%s", label.c_str());
+		if (ImGui::Button(buffer, buttonSize)){
 			values.z = resetValue;
+			func();
+		}
 		ImGui::SameLine();
 		sprintf(buffer, "##z%s", label.c_str());
-		ImGui::DragFloat(buffer, &values.z, 0.1f);
+		if (ImGui::DragFloat(buffer, &values.z, 0.1f)){
+			func();
+		}
 		ImGui::PopItemWidth();
 		// ImGui::SameLine();
 		ImGui::PopStyleColor(3);
@@ -194,9 +197,38 @@ namespace BSE {
 		// BSE_INFO("Inspecting Entity id: {0}", (uint32_t)entity.GetID());
 		DrawComponent<NameComponent>("Name", entity, [this](Entity& entity){
 			auto& name = m_Context->Registry().get<NameComponent>(entity.GetID()).Name;
+			
+			ImGui::Columns(2);
+			ImGui::SetColumnWidth(0, 200.0f);
+			
 			char buffer[256]; 
-			sprintf(buffer, "Имя##%d", (int)entity.GetID());
-			ImGui::InputText(buffer, &name);
+			sprintf(buffer, "##Имя%d", (int)entity.GetID());
+			ImGui::PushItemWidth(-1);
+			ImGui::InputText(buffer, &name, ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue);
+			ImGui::PopItemWidth();
+			
+			ImGui::NextColumn();
+			
+			// float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			if (ImGui::Button("Новый компонент", ImVec2{150.0f, 20.0f})){
+				ImGui::OpenPopup("Add component");
+			}
+			
+			if (ImGui::BeginPopup("Add component")){
+				if (ImGui::MenuItem("Камера")){
+					if (!m_SelectionContext.HasComponent<CameraControllerComponent>())
+						m_SelectionContext.AddComponent<CameraControllerComponent>(1.0f, 1.0f, true, true);
+					ImGui::CloseCurrentPopup();
+				}
+				if (ImGui::MenuItem("Спрайт")){
+					if (!m_SelectionContext.HasComponent<SpriteComponent>())
+						m_SelectionContext.AddComponent<SpriteComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			
+			ImGui::Columns(1);
 		}, false);
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
@@ -209,7 +241,7 @@ namespace BSE {
 			glm::vec3 rotation = glm::degrees(transform.Rotation);
 			DrawVec3Control("Поворот", rotation);
 			transform.Rotation = glm::radians(rotation);
-			DrawVec3Control("Размер", transform.Scale, 1.0f);
+			DrawVec3Control("Размер", transform.Scale, [](){}, 1.0f);
 			
 			// sprintf(buffer, "Поворот##%d", (int)entity.GetID());
 			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Rotation), 0.1f);
@@ -257,15 +289,15 @@ namespace BSE {
 			
 			if (cameraController->GetProjectionType() == CameraProjectionType::Perspective){
 				glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
-				if (ImGui::DragFloat3("Поворот", glm::value_ptr(rotation), 0.1f)){
+				DrawVec3Control("Поворот", rotation, [&rotation, &cameraController](){
 					cameraController->Rotate(rotation);
-				}
+				});
 				
 				glm::vec3 position = cameraController->GetCamera()->GetPosition();
-				if (ImGui::DragFloat3("Положение", glm::value_ptr(position), 0.1f)){
+				DrawVec3Control("Положение", position, [&position, &cameraController](){
 					cameraController->GetCamera()->SetPosition(position);
 					cameraController->SetProjectionDefault();
-				}
+				});
 				
 				float fov = cameraController->GetPerspectiveVerticalFOV();
 				if (ImGui::DragFloat("FOV", &fov, 0.1f)){
