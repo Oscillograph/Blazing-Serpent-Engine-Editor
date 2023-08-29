@@ -16,6 +16,9 @@ public:
 	
 	~SceneViewer()
 	{
+		BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
+		serializer.SerializeToFile("./assets/scenes/MainScene.BSEScene");
+		
 		if (m_CameraController != nullptr){
 			delete m_CameraController;
 			m_CameraController = nullptr;
@@ -42,25 +45,29 @@ public:
 		// Scene setup
 		ClientData::m_ActiveScene = new BSE::Scene();
 		
-		ClientData::m_Square = ClientData::m_ActiveScene->CreateEntity("Square");
-		
-		// TODO: find out why SpriteComponent breaks the app
-		ClientData::m_Square->AddComponent<BSE::SpriteComponent>(glm::vec4({1.0f, 0.3f, 0.2f, 1.0f}));
-		ClientData::m_Square->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
-		if (ClientData::m_Square->HasComponent<BSE::SpriteComponent>())
-			BSE_INFO("Added sprite component");
-		
-		ClientData::m_CameraA = ClientData::m_ActiveScene->CreateEntity("Camera Default");
-		ClientData::m_CameraA->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, false, false);
-		ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController->Rotate(0.0f);
-		// ClientData::m_CameraA->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
-		
-		ClientData::m_CameraB = ClientData::m_ActiveScene->CreateEntity("Camera Custom");
-		ClientData::m_CameraB->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, true, true);
-		ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController->Rotate(35.0f);
-		
-		// set default camera for the scene and cameracontroller
-		ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
+		BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
+		if (!serializer.DeserializeFromFile("./assets/scenes/MainScene.BSEScene")){
+			// Create defaults
+			ClientData::m_Square = ClientData::m_ActiveScene->CreateEntity("Square");
+			
+			// TODO: find out why SpriteComponent breaks the app
+			ClientData::m_Square->AddComponent<BSE::SpriteComponent>(glm::vec4({1.0f, 0.3f, 0.2f, 1.0f}));
+			ClientData::m_Square->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
+			if (ClientData::m_Square->HasComponent<BSE::SpriteComponent>())
+				BSE_INFO("Added sprite component");
+			
+			ClientData::m_CameraA = ClientData::m_ActiveScene->CreateEntity("Camera Default");
+			ClientData::m_CameraA->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, false, false);
+			ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController->Rotate(0.0f);
+			// ClientData::m_CameraA->AddComponent<BSE::NativeScriptComponent>().Bind<CameraScript>();
+			
+			ClientData::m_CameraB = ClientData::m_ActiveScene->CreateEntity("Camera Custom");
+			ClientData::m_CameraB->AddComponent<BSE::CameraControllerComponent>(uw, 1.5f, true, true);
+			ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController->Rotate(35.0f);
+			
+			// set default camera for the scene and cameracontroller
+			ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
+		}
 	}
 	
 	void OnDetach() override {
