@@ -15,6 +15,13 @@ struct ClientData {
 	
 	static int quadsMaxX;
 	static int quadsMaxY;
+	
+	// routines
+	static void NewScene(){
+		delete m_ActiveScene;
+		m_ActiveScene = new BSE::Scene();
+		m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
+	}
 };
 
 #endif

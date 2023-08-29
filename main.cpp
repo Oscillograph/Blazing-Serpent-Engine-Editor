@@ -86,7 +86,17 @@ public:
 			if (ImGui::BeginMenuBar())
 			{
 				if (ImGui::BeginMenu("Файл"))
-				{						
+				{	
+					if (ImGui::MenuItem("Новая сцена", "Ctrl-N")){
+						NewScene();
+					}
+					if (ImGui::MenuItem("Загрузить...", "Ctrl-O")){
+						OpenScene();
+					}
+					if (ImGui::MenuItem("Сохранить, как...", "Ctrl-S")){
+						SaveSceneAs();
+					}
+					ImGui::MenuItem("- - - - -");
 					if (ImGui::MenuItem("Выход"))
 						BSE::Application::Get()->Close();
 					ImGui::EndMenu();
@@ -96,21 +106,12 @@ public:
 		
 			ImGui::Begin("Разные настройки");
 				ImGui::ColorPicker4("Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
-				
-				// static char buf[256] = u8"Фыва";
-				// ImGui::InputText(u8"Строка", buf, IM_ARRAYSIZE(buf));
-				
-				if (ImGui::Button("Камера А")){
-					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
-					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
+		
+				if (ImGui::Button("Сохранить...")){
 					
-					BSE_INFO("Camera A activated");
 				}
-				if (ImGui::Button("Камера Б")){
-					ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraB->GetComponent<BSE::CameraControllerComponent>().CameraController);
-					ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
+				if (ImGui::Button("Загрузить...")){
 					
-					BSE_INFO("Camera B activated");
 				}
 			ImGui::End();
 		
@@ -130,7 +131,8 @@ public:
 				if ((m_ViewportSize.x != viewportPanelSize.x) || (m_ViewportSize.y != viewportPanelSize.y)){
 					m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 					BSE::GameData::m_FrameBuffer->Resize(m_ViewportSize);
-					ClientData::m_ActiveScene->GetCameraController()->OnResize(viewportPanelSize.x, viewportPanelSize.y);
+					if (ClientData::m_ActiveScene->GetCameraController() != nullptr)
+						ClientData::m_ActiveScene->GetCameraController()->OnResize(viewportPanelSize.x, viewportPanelSize.y);
 					// ClientData::m_ActiveScene->GetCameraController()->RefreshCamera();
 					// ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 				}
@@ -157,6 +159,66 @@ public:
 			ImGui::PopFont();
 		ImGui::End();
 	}
+	
+	void OnEvent(BSE::Event& e){
+		BSE::EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<BSE::KeyPressedEvent>([this](BSE::KeyPressedEvent& event){
+			return OnKeyPressed(event);
+		});
+	}
+	
+	bool OnKeyPressed(BSE::KeyPressedEvent& event){
+		if (event.GetRepeatCount() > 0)
+			return false;
+		
+		bool control = BSE::Input::IsKeyPressed(BSE::KeyCode::LeftControl) || BSE::Input::IsKeyPressed(BSE::KeyCode::RightControl);
+		bool shift = BSE::Input::IsKeyPressed(BSE::KeyCode::LeftShift) || BSE::Input::IsKeyPressed(BSE::KeyCode::RightShift);
+		
+		if (event.GetKeyCode() == (int)BSE::KeyCode::S){
+			if (control){
+				SaveSceneAs();
+				return true;
+			}
+		}
+		if (event.GetKeyCode() == (int)BSE::KeyCode::O){
+			if (control){
+				OpenScene();
+				return true;
+			}
+		}
+		if (event.GetKeyCode() == (int)BSE::KeyCode::N){
+			if (control){
+				NewScene();
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	void SaveSceneAs(){
+		std::string filepath = BSE::FileDialogs::SaveFile("Blazing Serpent Engine Scene (*.BSEScene)\0*.BSEScene\0");
+		if (filepath.size() > 0){
+			BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
+			serializer.SerializeToFile(filepath);
+		}
+	}
+	
+	void OpenScene(){
+		std::string filepath = BSE::FileDialogs::OpenFile("Blazing Serpent Engine Scene (*.BSEScene)\0*.BSEScene\0");
+		if (filepath.size() > 0){
+			NewScene();
+			
+			BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
+			serializer.DeserializeFromFile(filepath);
+		}
+	}
+	
+	void NewScene(){
+		ClientData::NewScene();
+	}
+	
+	void CloseScene(){}
 	
 private:
 	float layerTime = 0.0f;
