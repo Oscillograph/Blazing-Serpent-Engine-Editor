@@ -44,7 +44,9 @@ public:
 		
 		// Scene setup
 		ClientData::m_ActiveScene = new BSE::Scene();
+		ClientData::m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
 		
+		/*
 		BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
 		if (!serializer.DeserializeFromFile("./assets/scenes/MainScene.BSEScene")){
 			// Create defaults
@@ -68,6 +70,7 @@ public:
 			// set default camera for the scene and cameracontroller
 			ClientData::m_ActiveScene->SetCameraController(ClientData::m_CameraA->GetComponent<BSE::CameraControllerComponent>().CameraController);
 		}
+		*/
 	}
 	
 	void OnDetach() override {

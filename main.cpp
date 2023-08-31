@@ -107,12 +107,14 @@ public:
 			ImGui::Begin("Разные настройки");
 				ImGui::ColorPicker4("Цвет квадратов", glm::value_ptr(BSE::GameData::CustomColor));
 		
+				/*
 				if (ImGui::Button("Сохранить...")){
 					
 				}
 				if (ImGui::Button("Загрузить...")){
 					
 				}
+				*/
 			ImGui::End();
 		
 			ImGui::Begin("Квадратный фон");
