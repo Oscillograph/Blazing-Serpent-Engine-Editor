@@ -6,5 +6,5 @@ BSE::Entity* ClientData::m_Square = nullptr;
 BSE::Entity* ClientData::m_CameraA = nullptr;
 BSE::Entity* ClientData::m_CameraB = nullptr;
 
-int ClientData::quadsMaxX = 100;
-int ClientData::quadsMaxY = 100;
+int ClientData::quadsMaxX = 0;
+int ClientData::quadsMaxY = 0;

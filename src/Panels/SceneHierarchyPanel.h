@@ -25,12 +25,15 @@ namespace BSE {
 								float resetValue = 0.0f, 
 								float columnWidth = 100.0f);
 		void DrawComponents(Entity& entity);
+		Entity& GetSelectedEntity(){ return m_SelectionContext; }
+		bool IsSelectedEntity(){ return m_SelectedEntity; }
 	protected:
 		void DrawEntityNode(Entity& entity);
 		
 	private:
 		Scene* m_Context;
 		Entity m_SelectionContext; 
+		// Entity m_CurrentlySelectedEntity;
 		bool m_SelectedEntity = false;
 	};
 }

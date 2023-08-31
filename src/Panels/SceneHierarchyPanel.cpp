@@ -55,6 +55,7 @@ namespace BSE {
 		if (ImGui::IsItemClicked()){
 			m_SelectedEntity = true;
 			m_SelectionContext = entity;
+			// m_CurrentlySelectedEntity = entity;
 			// BSE_INFO("Clicked Entity id: {0}", (uint32_t)entity.GetID());
 		}
 		
@@ -329,6 +330,13 @@ namespace BSE {
 				if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
 					cameraController->SetOrthographicZFar(zFar);
 				}
+			}
+			
+			ImGui::Text("Соотношение сторон:");
+			bool isConstantAspectRatio = cameraController->GetConstantAspectRatio(); 
+			std::string buttonText = isConstantAspectRatio ? "Постоянное" : "Переменное";
+			if (ImGui::Button(buttonText.c_str())) {
+				cameraController->SetConstantAspectRatio(!isConstantAspectRatio);
 			}
 		});
 		

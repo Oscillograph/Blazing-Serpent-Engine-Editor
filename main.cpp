@@ -115,6 +115,22 @@ public:
 					
 				}
 				*/
+		
+				if (m_GizmoType != -1){
+					ImGui::Text("3D-Манипулятор");
+					std::string buttonText = "";
+					switch (m_GizmoType) {
+						case ImGuizmo::OPERATION::TRANSLATE: buttonText = "Перемещение"; break; // no Gizmo
+						case ImGuizmo::OPERATION::ROTATE: buttonText = "Поворот"; break;
+						case ImGuizmo::OPERATION::SCALE: buttonText = "Размер"; break;
+					default: buttonText = "???"; break;
+					}
+					if (ImGui::Button(buttonText.c_str())) {
+						m_GizmoType++;
+						if (m_GizmoType > 2)
+							m_GizmoType = 0;
+					}
+				}
 			ImGui::End();
 		
 			ImGui::Begin("Квадратный фон");
@@ -152,6 +168,116 @@ public:
 					{0, 1},
 					{1, 0}
 					);
+		
+				// ============================================
+				// Gizmos
+				// m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				if (m_Panel->IsSelectedEntity()){
+					if (m_GizmoType == -1)
+						m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+					BSE::Entity selectedEntity = m_Panel->GetSelectedEntity();
+					ImGuizmo::SetOrthographic(false);
+					ImGuizmo::SetDrawlist();
+					float windowWidth = (float)ImGui::GetWindowWidth();
+					float windowHeight = (float)ImGui::GetWindowHeight();
+					ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+					
+					// Camera controller and camera itself 
+					auto cameraController = ClientData::m_ActiveScene->GetCameraController();
+					auto camera = ClientData::m_ActiveScene->GetCameraController()->GetCamera();
+					
+					glm::mat4 cameraView = camera->GetViewMatrix();
+					glm::mat4 cameraProjection = camera->GetProjectionMatrix();
+					
+					// Entity transform
+					auto& transformComponent = selectedEntity.GetComponent<BSE::TransformComponent>();
+					glm::mat4 transform = transformComponent.GetTransform();
+					
+					// ----------------------
+					// Snap to grid section
+					bool snap = BSE::Input::IsKeyPressed(BSE::KeyCode::LeftControl); // TODO: allow to customize the key
+					float snapValue;
+					switch (m_GizmoType) {
+						case ImGuizmo::OPERATION::TRANSLATE: snapValue = 0.5f; break; // no Gizmo
+						case ImGuizmo::OPERATION::ROTATE: snapValue = 0.3925f; break;
+						case ImGuizmo::OPERATION::SCALE: snapValue = 0.5f; break;
+					}
+					float snapValues[3] = { snapValue, snapValue, snapValue };
+					// ----------------------
+					
+					ImGuizmo::Manipulate(
+						glm::value_ptr(cameraView), 
+						glm::value_ptr(cameraProjection), 
+						(ImGuizmo::OPERATION)m_GizmoType, 
+						ImGuizmo::LOCAL, 
+						glm::value_ptr(transform),
+						nullptr,
+						snap ? snapValues : nullptr
+						);
+					
+					if (ImGuizmo::IsUsing) {
+						/*
+						glm::vec3 translation, scale;
+						glm::quat rotation;
+						translation = transform[3];
+
+						for(int i = 0; i < 3; i++)
+							scale[i] = glm::length(glm::vec3(transform[i]));
+						const glm::mat3 rotMtx(
+							glm::vec3(transform[0]) / scale[0],
+							glm::vec3(transform[1]) / scale[1],
+							glm::vec3(transform[2]) / scale[2]);
+						rotation = glm::quat_cast(rotMtx);
+						
+						transformComponent.Translation = translation; 
+						transformComponent.Rotation = glm::eulerAngles(rotation);
+						transformComponent.Scale = scale;
+						*/
+						
+						
+						glm::vec3 scale;
+						glm::quat rotation;
+						glm::vec3 translation;
+						glm::vec3 skew;
+						glm::vec4 perspective;
+						glm::decompose(transform, scale, rotation, translation, skew, perspective);
+						
+						transformComponent.Translation = translation;
+						// rotation = glm::eulerAngles(glm::conjugate(rotation));
+						// glm::vec3 rot = glm::eulerAngles(glm::conjugate(rotation));
+						glm::vec3 rot = -glm::eulerAngles(glm::conjugate(rotation));
+						glm::vec3 deltaRotation = rot - transformComponent.Rotation;
+						BSE_CORE_INFO("PX: {0}, PY: {1}, PZ: {2}", 
+							transformComponent.Rotation[0], transformComponent.Rotation[1], transformComponent.Rotation[2]);
+						BSE_CORE_INFO("CX: {0}, CY: {1}, CZ: {2}", 
+							rot[0], rot[1], rot[2]);
+						// rounding up to the fourth digit after the dot looks nice
+						for (int i = 0; i < 3; i++){
+							deltaRotation[i] = roundf(10000 * deltaRotation[i])/10000;
+						}
+						BSE_CORE_INFO("DX: {0}, DY: {1}, DZ: {2}", 
+							deltaRotation[0], deltaRotation[1], deltaRotation[2]);
+						transformComponent.Rotation += deltaRotation;
+						transformComponent.Scale = scale;
+						
+						
+						/*
+						glm::vec3 translation, rotation, scale;
+						BSE::Math::Mat4Decompose(transform, translation, rotation, scale);
+						transformComponent.Translation = translation;
+						
+						// MAGIC? Aimed to fix gimble lock problem, according to The Cherno
+						glm::vec3 deltaRotation = glm::conjugate(rotation) - transformComponent.Rotation; 
+						transformComponent.Rotation += deltaRotation;
+						
+						transformComponent.Scale = scale;
+						*/
+					}
+				} else {
+					m_GizmoType = -1;
+				}
+				// ============================================
+				
 			ImGui::End();
 			ImGui::PopStyleVar();
 		
@@ -228,7 +354,10 @@ private:
 	BSE::Texture2D* broTexture;
 	
 	// Panels
-	BSE::SceneHierarchyPanel* m_Panel = nullptr; 
+	BSE::SceneHierarchyPanel* m_Panel = nullptr;
+	
+	// tools
+	int m_GizmoType = -1;
 };
 
 class Editor : public BSE::Application {
@@ -241,6 +370,7 @@ public:
 		PushOverlay(GetImGuiLayer());
 		
 		m_ImGuiLayerEnabled = true;
+		// TODO: find out why m_WinTitle is overridden by the engine library
 		m_WinTitle = "BSE Editor";
 		m_Window->SetTitle(m_WinTitle);
 		m_Window->SetVSync(false);
