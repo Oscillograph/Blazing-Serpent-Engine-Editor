@@ -235,20 +235,11 @@ namespace BSE {
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
 			auto& transform = m_Context->Registry().get<TransformComponent>(entity.GetID());
 			
-			// char buffer[256]; 
-			// sprintf(buffer, "Позиция##%d", (int)entity.GetID());
-			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Translation), 0.1f);
 			DrawVec3Control("Позиция", transform.Translation);
 			glm::vec3 rotation = glm::degrees(transform.Rotation);
 			DrawVec3Control("Поворот", rotation);
 			transform.Rotation = glm::radians(rotation);
 			DrawVec3Control("Размер", transform.Scale, [](){}, 1.0f);
-			
-			// sprintf(buffer, "Поворот##%d", (int)entity.GetID());
-			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Rotation), 0.1f);
-			
-			// sprintf(buffer, "Размер##%d", (int)entity.GetID());
-			// ImGui::DragFloat3(buffer, glm::value_ptr(transform.Scale), 0.1f);
 		}, false);
 		
 		// DrawComponent<NativeScriptComponent>("Native Script", entity, [this](Entity& entity){ });

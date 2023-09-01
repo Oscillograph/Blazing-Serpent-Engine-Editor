@@ -19,8 +19,12 @@ struct ClientData {
 	// routines
 	static void NewScene(){
 		delete m_ActiveScene;
+		m_ActiveScene = nullptr;
+		BSE_CORE_INFO("New Scene created");
 		m_ActiveScene = new BSE::Scene();
+		// BSE::GameData::m_App->PushLayer(m_ActiveScene);
 		m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
+		BSE_CORE_INFO("New Scene camera controller set");
 	}
 };
 

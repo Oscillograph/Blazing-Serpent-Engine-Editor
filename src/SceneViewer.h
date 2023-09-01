@@ -93,6 +93,11 @@ public:
 			
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// CAMERA
+			// if no cameras bound, reset camera controller to one of the engine
+			if (ClientData::m_ActiveScene->GetCameraController() == nullptr){
+				ClientData::m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
+			}
+			// and do not update camera if the scene viewport is not focused
 			if (ClientData::ViewPortFocused) {
 				ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 			}
@@ -171,6 +176,7 @@ public:
 	}
 	
 	void OnEvent(BSE::Event& event) override {
+		// allow camera manipulation via scene
 		if (ClientData::ViewPortFocused){
 			ClientData::m_ActiveScene->GetCameraController()->OnEvent(event);
 		}
