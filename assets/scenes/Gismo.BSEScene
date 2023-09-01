@@ -1,0 +1,59 @@
+Scene: Unnamed
+Entities:
+  - Entity: 3
+    NameComponent:
+      Name: Right
+    TransformComponent:
+      Translation: [0.699999988, 0, 0]
+      Rotation: [0, 0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteComponent:
+      Color: [0.392156869, 0.392156869, 0.392156869, 1]
+  - Entity: 2
+    NameComponent:
+      Name: Left
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, -0.785398185, 0]
+      Scale: [1, 1, 1]
+    SpriteComponent:
+      Color: [0.784313738, 0.784313738, 0.784313738, 1]
+  - Entity: 1
+    NameComponent:
+      Name: Top
+    TransformComponent:
+      Translation: [0.349999994, 0.5, -0.349999994]
+      Rotation: [1.57079637, 0, 0.785398185]
+      Scale: [1, 1, 1]
+    SpriteComponent:
+      Color: [0.980392158, 0.980392158, 0.980392158, 1]
+  - Entity: 0
+    NameComponent:
+      Name: Камера
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    CameraControllerComponent:
+      Player Controlled: false
+      Works: true
+      CameraController:
+        Rotatable: true
+        ConstantAspectRatio: false
+        ProjectionType: 0
+        PerspectiveHorizontalFOV: 60
+        PerspectiveVerticalFOV: 45
+        PerspectiveNear: 0.00999999978
+        PerspectiveFar: 1000
+        OrthographicCameraBounds: [-0.732446909, 0.732446909, 0.850000083, -0.850000083, -2, 16]
+        AspectRatio: 0.861702144
+        ZoomLevel: 1.70000017
+        Camera:
+          ProjectionMatrix: [2.80167985, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00002003, -1, 0, 0, -0.0200002007, 0]
+          ViewMatrix: [1, -0, 0, -0, -0, 0.965925932, 0.258819073, 0, 0, -0.258819073, 0.965925932, -0, -0.200000018, -0.368783802, -4.03286505, 1]
+          ViewProjectionMatrix: [2.80167985, 0, 0, 0, 0, 2.33195138, -0.258824259, -0.258819073, 0, -0.624844491, -0.965945303, -0.965925932, -0.560335994, -0.890322804, 4.01294565, 4.03286505]
+          Position: [0.200000003, 1.39999998, 3.79999995]
+          Rotation: [-15, 0, 0]
+          RotationX: -15
+          RotationY: 0
+          RotationZ: 0
