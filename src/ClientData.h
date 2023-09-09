@@ -16,6 +16,8 @@ struct ClientData {
 	static int quadsMaxX;
 	static int quadsMaxY;
 	
+	static bool EditorCameraOn;
+	
 	// routines
 	static void NewScene(){
 		delete m_ActiveScene;

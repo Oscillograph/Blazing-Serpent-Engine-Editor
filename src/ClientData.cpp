@@ -8,3 +8,5 @@ BSE::Entity* ClientData::m_CameraB = nullptr;
 
 int ClientData::quadsMaxX = 0;
 int ClientData::quadsMaxY = 0;
+
+bool ClientData::EditorCameraOn = false;

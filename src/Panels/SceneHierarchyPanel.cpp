@@ -251,6 +251,7 @@ namespace BSE {
 			if (ClientData::m_ActiveScene->GetCameraController() == cameraController){
 				if (ImGui::Button("Отвязать от сцены##cameraComponent")){
 					ClientData::m_ActiveScene->SetCameraController(nullptr);
+					ClientData::EditorCameraOn = false;
 				}
 			} else {
 				if (ImGui::Button("Привязать к сцене##cameraComponent")){

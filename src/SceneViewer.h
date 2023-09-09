@@ -3,6 +3,7 @@
 
 #include <BSE_Client.h>
 #include "./ClientData.h"
+#include "./EditorCamera.h"
 
 class SceneViewer : public BSE::Layer {
 public:
@@ -32,10 +33,24 @@ public:
 		unsigned int h = BSE::Application::Get()->GetWindow()->GetHeight();
 		float uw = (float)w/(float)h;
 		// float uh = 2*(float)h/(float)h;
+		// TODO: Make a separate camera controller class for Editor Camera
 		m_CameraController = new BSE::OrthographicCameraController(uw, 1.5f, true, false);
+		m_CameraController->SetProjectionType(BSE::CameraProjectionType::Perspective);
+		m_CameraController->SetCamera(
+			new BSE::EditorCamera(
+				glm::radians(m_CameraController->GetPerspectiveVerticalFOV()), 
+				m_CameraController->GetAspectRatio(), 
+				m_CameraController->GetPerspectiveNear(),
+				m_CameraController->GetPerspectiveFar()
+				),
+			true);
 		BSE::GameData::m_CameraController = m_CameraController;
 		// ------------------------------------------------
 		BSE::FrameBufferSpecification fbSpec;
+		fbSpec.Attachments = { 
+			BSE::FrameBufferTextureFormat::RGBA8, 
+			BSE::FrameBufferTextureFormat::Depth 
+		};
 		fbSpec.Width = m_Window->GetWidth();
 		fbSpec.Height = m_Window->GetHeight();
 		m_FrameBufferA = BSE::FrameBuffer::Create(fbSpec);
@@ -96,6 +111,7 @@ public:
 			// if no cameras bound, reset camera controller to one of the engine
 			if (ClientData::m_ActiveScene->GetCameraController() == nullptr){
 				ClientData::m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
+				ClientData::EditorCameraOn = true;
 			}
 			// and do not update camera if the scene viewport is not focused
 			if (ClientData::ViewPortFocused) {

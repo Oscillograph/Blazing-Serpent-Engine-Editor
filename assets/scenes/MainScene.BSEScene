@@ -5,7 +5,7 @@ Entities:
       Name: Камера
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [-0, 0, -0]
       Scale: [1, 1, 1]
     CameraControllerComponent:
       Player Controlled: false
@@ -35,8 +35,8 @@ Entities:
       Name: Top
     TransformComponent:
       Translation: [0.349999994, 0.5, -0.349999994]
-      Rotation: [1.57079673, -2.98023224e-08, 0.785398304]
-      Scale: [0.999999881, 0.999999881, 1]
+      Rotation: [1.57079637, 0, 0.785398185]
+      Scale: [1, 1, 1]
     SpriteComponent:
       Color: [0.980392158, 0.980392158, 0.980392158, 1]
   - Entity: 1
