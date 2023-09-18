@@ -9,6 +9,83 @@
 // Panels
 #include "./src/Panels/SceneHierarchyPanel.h"
 
+using VoidFn = std::function<void(BSE::Entity& entity)>;
+using EmptyFn = std::function<void()>;
+void DrawVec3Control(	const std::string& label, 
+						glm::vec3& values, 
+						EmptyFn func = [](){}, 
+						float resetValue = 0.0f, 
+						float columnWidth = 100.0f
+	){
+	ImGuiContext* GImGui = ImGui::GetCurrentContext();
+	char buffer[256]; 
+	
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
+	
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
+	
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = {lineHeight + 3.0f, lineHeight};
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.8f, 0.3f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.8f, 0.6f, 0.4f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{1.0f, 0.7f, 0.7f, 1.0f});
+	sprintf(buffer, "X##x%s", label.c_str());
+	if (ImGui::Button(buffer, buttonSize)){
+		values.x = resetValue;
+		func();
+	}
+	ImGui::SameLine();
+	sprintf(buffer, "##x%s", label.c_str());
+	if (ImGui::DragFloat(buffer, &values.x, 0.1f)){
+		func();
+	}
+	ImGui::PopItemWidth();
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.3f, 0.8f, 0.15f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.6f, 0.8f, 0.4f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 1.0f, 0.7f, 1.0f});
+	sprintf(buffer, "Y##y%s", label.c_str());
+	if (ImGui::Button(buffer, buttonSize)){
+		values.y = resetValue;
+		func();
+	}
+	ImGui::SameLine();
+	sprintf(buffer, "##y%s", label.c_str());
+	if (ImGui::DragFloat(buffer, &values.y, 0.1f)){
+		func();
+	}
+	ImGui::PopItemWidth();
+	ImGui::PopStyleColor(3);
+	ImGui::SameLine();
+	
+	
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{0.15f, 0.3f, 0.8f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{0.4f, 0.6f, 0.8f, 1.0f});
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{0.7f, 0.7f, 1.0f, 1.0f});
+	sprintf(buffer, "Z##z%s", label.c_str());
+	if (ImGui::Button(buffer, buttonSize)){
+		values.z = resetValue;
+		func();
+	}
+	ImGui::SameLine();
+	sprintf(buffer, "##z%s", label.c_str());
+	if (ImGui::DragFloat(buffer, &values.z, 0.1f)){
+		func();
+	}
+	ImGui::PopItemWidth();
+	// ImGui::SameLine();
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar();
+	ImGui::Columns(1);
+}
+
 class EditorGuiLayer : public BSE::ImGuiLayer {
 public:
 	EditorGuiLayer() {
@@ -138,6 +215,61 @@ public:
 				ImGui::DragInt("##maxX", &(ClientData::quadsMaxX), 1);
 				ImGui::Text("По вертикали:");
 				ImGui::DragInt("##maxY", &(ClientData::quadsMaxY), 1);
+		
+				{
+					auto cameraController = BSE::GameData::m_CameraController;
+					
+					const char* projectionTypeStrings[] = {
+						"Перспектива",
+						"Ортография"
+					};
+					const char* currentProjectionTypeString = projectionTypeStrings[(int)cameraController->GetProjectionType()];
+					if (ImGui::BeginCombo("Тип проекции", currentProjectionTypeString)){
+						for (int i = 0; i < 2; i++){
+							bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
+							if (ImGui::Selectable(projectionTypeStrings[i], isSelected)){
+								currentProjectionTypeString = projectionTypeStrings[i];
+								cameraController->SetProjectionType((BSE::CameraProjectionType)i);
+								cameraController->RefreshCamera();
+							}
+							
+							if (isSelected){
+								ImGui::SetItemDefaultFocus();
+							}
+						}
+						ImGui::EndCombo();
+					}
+					
+					glm::vec3 rotation = cameraController->GetRotation();
+					DrawVec3Control("Поворот", rotation, [&rotation, &cameraController](){
+						cameraController->Rotate(rotation);
+						cameraController->UpdateView();
+					});
+					
+					glm::vec3 position = cameraController->GetCameraPosition();
+					DrawVec3Control("Положение", position, [&position, &cameraController](){
+						cameraController->SetCameraPosition(position);
+						cameraController->UpdateView();
+					});
+					
+					float fov = cameraController->GetPerspectiveFOV();
+					if (ImGui::DragFloat("FOV", &fov, 0.1f)){
+						cameraController->SetPerspectiveFOV(fov);
+						cameraController->UpdateProjection();
+					}
+					
+					float zNear = cameraController->GetPerspectiveNear();
+					if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
+						cameraController->SetPerspectiveNear(zNear);
+						cameraController->UpdateProjection();
+					}
+					
+					float zFar = cameraController->GetPerspectiveFar();
+					if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
+						cameraController->SetPerspectiveFar(zFar);
+						cameraController->UpdateProjection();
+					}
+				}
 			ImGui::End();
 		
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));

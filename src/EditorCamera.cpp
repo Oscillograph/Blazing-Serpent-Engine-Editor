@@ -4,6 +4,7 @@ namespace BSE {
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
 		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip)
 	{
+		BSE_INFO("Calling Editor Camera constructor");
 		UpdateView();
 	}
 	
@@ -144,7 +145,8 @@ namespace BSE {
 	
 	glm::vec3 EditorCamera::CalculatePosition()
 	{
-		return m_FocalPoint = GetForwardDirection() * m_Distance;
+		m_FocalPoint = GetForwardDirection() * m_Distance;
+		return m_FocalPoint;
 	}
 	
 }

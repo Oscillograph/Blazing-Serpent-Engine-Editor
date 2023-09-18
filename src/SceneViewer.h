@@ -3,7 +3,8 @@
 
 #include <BSE_Client.h>
 #include "./ClientData.h"
-#include "./EditorCamera.h"
+// #include "./EditorCamera.h"
+// #include "./EditorCameraController.h"
 
 class SceneViewer : public BSE::Layer {
 public:
@@ -34,16 +35,9 @@ public:
 		float uw = (float)w/(float)h;
 		// float uh = 2*(float)h/(float)h;
 		// TODO: Make a separate camera controller class for Editor Camera
-		m_CameraController = new BSE::OrthographicCameraController(uw, 1.5f, true, false);
-		m_CameraController->SetProjectionType(BSE::CameraProjectionType::Perspective);
-		m_CameraController->SetCamera(
-			new BSE::EditorCamera(
-				glm::radians(m_CameraController->GetPerspectiveVerticalFOV()), 
-				m_CameraController->GetAspectRatio(), 
-				m_CameraController->GetPerspectiveNear(),
-				m_CameraController->GetPerspectiveFar()
-				),
-			true);
+		// m_CameraController = new BSE::GeneralCameraController(uw, 1.5f, true, false);
+		m_CameraController = new BSE::CameraController(45.0f, 1.778f, 0.1f, 1000.0f);
+		m_CameraController->editorCamera = true;
 		BSE::GameData::m_CameraController = m_CameraController;
 		// ------------------------------------------------
 		BSE::FrameBufferSpecification fbSpec;
@@ -105,18 +99,26 @@ public:
 		// RENDER
 		if (BSE::RenderCommand::GetAPI() != nullptr){
 			BSE_PROFILE_SCOPE("Sandbox2D OnUpdate");
-			
+			// BSE_CORE_INFO("Editor Camera? {0}", ClientData::m_ActiveScene->GetCameraController()->IsEditorCamera());
+			// BSE_CORE_INFO("Editor Camera? {0}", (int)ClientData::m_ActiveScene->GetCameraController()->GetProjectionType());
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			// CAMERA
 			// if no cameras bound, reset camera controller to one of the engine
+			// TODO: Fix Editor Camera Controller crashing the app
+			//BSE_INFO("1. Is this the stop point?");
 			if (ClientData::m_ActiveScene->GetCameraController() == nullptr){
+			//	BSE_INFO("2. Is this the stop point?");
 				ClientData::m_ActiveScene->SetCameraController(BSE::GameData::m_CameraController);
-				ClientData::EditorCameraOn = true;
+			//	BSE_INFO("3. Is this the stop point?");
+				// ClientData::EditorCameraOn = true;
 			}
 			// and do not update camera if the scene viewport is not focused
+			// BSE_INFO("4. Is this the stop point?");
 			if (ClientData::ViewPortFocused) {
+				// BSE_INFO("Is this the stop point?");
 				ClientData::m_ActiveScene->GetCameraController()->OnUpdate(time);
 			}
+			// BSE_INFO("5. Is this the stop point?");
 			// BSE_TRACE("Camera controller updated");
 			// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			
@@ -145,7 +147,9 @@ public:
 			
 			if (ClientData::m_ActiveScene->GetCameraController() != nullptr){
 				// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
+				// BSE_INFO("6. Is this the stop point?"); // this is the last message !!!!!!!!!!!!!!!!!!
 				BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCameraController()->GetCamera());
+				// BSE_INFO("7. Is this the stop point?");
 				
 				for (int x = 0; x < ClientData::quadsMaxX; x++){
 					for (int y = 0; y < ClientData::quadsMaxY; y++){
@@ -203,8 +207,8 @@ private:
 	
 	BSE::Window* m_Window = nullptr;
 	std::string m_Title;
-	BSE::OrthographicCameraController* m_CameraController = nullptr;
-	BSE::OrthographicCamera* m_Camera = nullptr; 
+	BSE::CameraController* m_CameraController = nullptr;
+	BSE::GeneralCamera* m_Camera = nullptr; 
 	
 	BSE::FrameBuffer* m_FrameBufferA;
 	// BSE::FrameBuffer* m_FrameBufferB;

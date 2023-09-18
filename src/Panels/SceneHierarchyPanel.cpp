@@ -246,7 +246,7 @@ namespace BSE {
 
 		
 		DrawComponent<CameraControllerComponent>("Camera Controller", entity, [this](Entity& entity){
-			auto& cameraController = m_Context->Registry().get<CameraControllerComponent>(entity.GetID()).CameraController;
+			CameraController* cameraController = m_Context->Registry().get<CameraControllerComponent>(entity.GetID()).cameraController;
 			
 			if (ClientData::m_ActiveScene->GetCameraController() == cameraController){
 				if (ImGui::Button("Отвязать от сцены##cameraComponent")){
@@ -281,30 +281,34 @@ namespace BSE {
 			}
 			
 			if (cameraController->GetProjectionType() == CameraProjectionType::Perspective){
-				glm::vec3 rotation = cameraController->GetCamera()->GetRotation();
+				glm::vec3 rotation = cameraController->GetRotation();
 				DrawVec3Control("Поворот", rotation, [&rotation, &cameraController](){
 					cameraController->Rotate(rotation);
+					cameraController->UpdateView();
 				});
 				
-				glm::vec3 position = cameraController->GetCamera()->GetPosition();
+				glm::vec3 position = cameraController->GetCameraPosition();
 				DrawVec3Control("Положение", position, [&position, &cameraController](){
-					cameraController->GetCamera()->SetPosition(position);
-					cameraController->SetProjectionDefault();
+					cameraController->SetCameraPosition(position);
+					cameraController->UpdateView();
 				});
 				
-				float fov = cameraController->GetPerspectiveVerticalFOV();
+				float fov = cameraController->GetPerspectiveFOV();
 				if (ImGui::DragFloat("FOV", &fov, 0.1f)){
-					cameraController->SetPerspectiveVerticalFOV(fov);
+					cameraController->SetPerspectiveFOV(fov);
+					cameraController->UpdateProjection();
 				}
 				
 				float zNear = cameraController->GetPerspectiveNear();
 				if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
 					cameraController->SetPerspectiveNear(zNear);
+					cameraController->UpdateProjection();
 				}
 				
 				float zFar = cameraController->GetPerspectiveFar();
 				if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
 					cameraController->SetPerspectiveFar(zFar);
+					cameraController->UpdateProjection();
 				}
 			}
 			
@@ -312,23 +316,25 @@ namespace BSE {
 				float zoomlevel = cameraController->GetZoomLevel();
 				if (ImGui::DragFloat("Размер", &zoomlevel, 0.1f)){
 					cameraController->SetZoomLevel(zoomlevel);
+					cameraController->UpdateProjection();
 				}
 				float zNear = cameraController->GetOrthographicZNear();
 				if (ImGui::DragFloat("Ближняя зона", &zNear, 0.1f)){
 					cameraController->SetOrthographicZNear(zNear);
+					cameraController->UpdateProjection();
 				}
 				
 				float zFar = cameraController->GetOrthographicZFar();
 				if (ImGui::DragFloat("Дальняя зона", &zFar, 0.1f)){
 					cameraController->SetOrthographicZFar(zFar);
+					cameraController->UpdateProjection();
 				}
 			}
 			
-			ImGui::Text("Соотношение сторон:");
-			bool isConstantAspectRatio = cameraController->GetConstantAspectRatio(); 
-			std::string buttonText = isConstantAspectRatio ? "Постоянное" : "Переменное";
+			ImGui::Text("Соотношение сторон:"); 
+			std::string buttonText = cameraController->constantAspectRatio ? "Постоянное" : "Переменное";
 			if (ImGui::Button(buttonText.c_str())) {
-				cameraController->SetConstantAspectRatio(!isConstantAspectRatio);
+				cameraController->constantAspectRatio = !cameraController->constantAspectRatio;
 			}
 		});
 		
