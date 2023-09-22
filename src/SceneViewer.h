@@ -42,7 +42,8 @@ public:
 		// ------------------------------------------------
 		BSE::FrameBufferSpecification fbSpec;
 		fbSpec.Attachments = { 
-			BSE::FrameBufferTextureFormat::RGBA8, 
+			BSE::FrameBufferTextureFormat::RGBA8,
+			BSE::FrameBufferTextureFormat::RED_INTEGER,
 			BSE::FrameBufferTextureFormat::Depth 
 		};
 		fbSpec.Width = m_Window->GetWidth();
@@ -50,6 +51,7 @@ public:
 		m_FrameBufferA = BSE::FrameBuffer::Create(fbSpec);
 		// m_FrameBufferB = BSE::FrameBuffer::Create(fbSpec);
 		BSE::GameData::m_FrameBuffer = m_FrameBufferA;
+		ClientData::m_FrameBuffer = m_FrameBufferA;
 		
 		// Scene setup
 		ClientData::m_ActiveScene = new BSE::Scene();

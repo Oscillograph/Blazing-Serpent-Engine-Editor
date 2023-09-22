@@ -13,6 +13,8 @@ struct ClientData {
 	static BSE::Entity* m_CameraA;
 	static BSE::Entity* m_CameraB;
 	
+	static BSE::FrameBuffer* m_FrameBuffer;
+	
 	static int quadsMaxX;
 	static int quadsMaxY;
 	

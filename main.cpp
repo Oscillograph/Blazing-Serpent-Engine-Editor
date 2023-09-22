@@ -276,8 +276,10 @@ public:
 			ImGui::Begin("Сцена");
 				// TODO: AssetManager, GameData storage
 				// ImGui::Image((void*)(BSE::AssetManager->GetTexture(GameData->Textures[0])->GetID()), {1.0f, 1.0f});
+				
 				ClientData::ViewPortFocused = ImGui::IsWindowFocused();
 				ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		
 				if ((m_ViewportSize.x != viewportPanelSize.x) || (m_ViewportSize.y != viewportPanelSize.y)){
 					m_ViewportSize = {viewportPanelSize.x, viewportPanelSize.y};
 					BSE::GameData::m_FrameBuffer->Resize(m_ViewportSize);
@@ -293,7 +295,7 @@ public:
 				} else {
 					sceneTexture = broTexture->GetID();
 				}
-					
+				
 				ImGui::Image(
 					(void*)sceneTexture, 
 					{m_ViewportSize.x, m_ViewportSize.y},
@@ -301,18 +303,55 @@ public:
 					{1, 0}
 					);
 		
+				// capture mouse coordinates on scene texture
+				ImVec2 viewportOffset = ImGui::GetCursorPos();
+				ImVec2 windowSize = ImGui::GetWindowSize();
+				ImVec2 minBound = ImGui::GetWindowPos();
+				// minBound.x += viewportOffset.x;
+				// minBound.y += viewportOffset.y;
+		
+				ImVec2 maxBound = {minBound.x + windowSize.x, minBound.y + windowSize.y};
+				m_ViewportBounds[0] = {minBound.x, minBound.y};
+				m_ViewportBounds[1] = {maxBound.x, maxBound.y};
+		
+				auto [mx, my] = ImGui::GetMousePos();
+				mx -= m_ViewportBounds[0].x;
+				my -= m_ViewportBounds[0].y;
+				glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+				my = viewportSize.y - my; // flip coordinates to match OpenGL system
+				
+				int mouseX = (int)mx;
+				int mouseY = (int)my;
+				if ((mouseX > 0) && (mouseY > 0) && (mouseX < (int)viewportSize.x) && (mouseY < (int)viewportSize.y)) {
+					ClientData::m_FrameBuffer->Bind();
+					int pixelData = ClientData::m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
+					BSE_CORE_WARN("Mouse: {0}, {1} - {2}", mx, my, pixelData);
+					BSE_CORE_WARN("Buffer size: {0}, {1}", 
+						ClientData::m_FrameBuffer->GetWidth(),
+						ClientData::m_FrameBuffer->GetHeight());
+					BSE_CORE_WARN("Viewport size: {0}, {1}",
+						viewportSize.x,
+						viewportSize.y);
+					ClientData::m_FrameBuffer->Unbind();
+				}
+		
 				// ============================================
 				// Gizmos
 				// m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+				// TODO: Fix gizmo mismatch an object
 				if (m_Panel->IsSelectedEntity()){
 					if (m_GizmoType == -1)
 						m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
 					BSE::Entity selectedEntity = m_Panel->GetSelectedEntity();
 					ImGuizmo::SetOrthographic(false);
 					ImGuizmo::SetDrawlist();
-					float windowWidth = (float)ImGui::GetWindowWidth();
-					float windowHeight = (float)ImGui::GetWindowHeight();
-					ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+					
+					ImGuizmo::SetRect(
+						ImGui::GetWindowPos().x, 
+						ImGui::GetWindowPos().y, 
+						(float)ImGui::GetWindowWidth(), 
+						(float)ImGui::GetWindowHeight()
+						);
 					
 					// Camera controller and camera itself 
 					auto cameraController = ClientData::m_ActiveScene->GetCameraController();
@@ -340,9 +379,10 @@ public:
 					
 					ImGuizmo::Manipulate(
 						glm::value_ptr(cameraView), 
-						glm::value_ptr(cameraProjection), 
+						glm::value_ptr(cameraProjection),
+						// glm::value_ptr(transform),
 						(ImGuizmo::OPERATION)m_GizmoType, 
-						ImGuizmo::LOCAL, 
+						ImGuizmo::LOCAL,
 						glm::value_ptr(transform),
 						nullptr,
 						snap ? snapValues : nullptr
@@ -438,6 +478,7 @@ public:
 private:
 	float layerTime = 0.0f;
 	glm::vec2 m_ViewportSize = {600.0f, 400.0f};
+	glm::vec2 m_ViewportBounds[2];
 	BSE::Texture2D* broTexture;
 	
 	// Panels

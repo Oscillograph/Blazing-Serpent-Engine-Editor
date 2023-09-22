@@ -30,6 +30,7 @@ void main(){
 #type fragment
 #version 330 core
 layout(location = 0) out vec4 color;
+layout(location = 1) out int entity;
 
 in vec4 v_Color;
 in vec2 v_TextureCoordinates;
@@ -40,4 +41,5 @@ uniform sampler2D u_Textures[32];
 
 void main(){
 	color =  texture(u_Textures[int(v_TextureIndex)], v_TextureCoordinates * v_TilingFactor) * v_Color;
+	entity = -2; // placeholder
 }

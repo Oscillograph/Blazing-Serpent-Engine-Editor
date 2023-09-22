@@ -1,5 +1,37 @@
 Scene: Unnamed
 Entities:
+  - Entity: 3
+    NameComponent:
+      Name: Камера
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0, 0, -0]
+      Scale: [1, 1, 1]
+    CameraControllerComponent:
+      Player Controlled: false
+      Works: true
+      CameraController:
+        EditorCamera: true
+        Rotatable: true
+        Translatable: true
+        Zoomable: true
+        ConstantAspectRatio: false
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.100000001
+        PerspectiveFar: 1000
+        OrthographicCameraBounds: [-0.102739729, 0.102739729, 0.150000006, -0.150000006, -2, 16]
+        AspectRatio: 0.684931517
+        ZoomLevel: 0.300000012
+        Camera:
+          ProjectionMatrix: [3.5247519, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00019991, -1, 0, 0, -0.20002, 0]
+          ViewMatrix: [0.999657333, -0.0115162646, -0.0235076323, 0, 0, 0.898027658, -0.439939022, 0, 0.0261769574, 0.439788282, 0.89771992, 0, 0.105873048, 1.58219969, 2.27593398, 1]
+          ViewProjectionMatrix: [3.52354407, -2.24841146e-09, -0.0261821933, -0.0261769593, -0.0405919775, 2.1680305, -0.439876199, -0.439788282, -0.0828585699, -1.06210673, -0.897899389, -0.89771992, -0.12024311, -1.012972, 2.54228354, 2.74175549]
+          Position: [0.105873048, 1.58219969, 2.27593398]
+          Rotation: [-26.0999908, 1.50000048, 0]
+          RotationX: -26.0999908
+          RotationY: 1.50000048
+          RotationZ: 0
   - Entity: 2
     NameComponent:
       Name: Top

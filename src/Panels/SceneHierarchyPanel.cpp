@@ -218,7 +218,11 @@ namespace BSE {
 			if (ImGui::BeginPopup("Add component")){
 				if (ImGui::MenuItem("Камера")){
 					if (!m_SelectionContext.HasComponent<CameraControllerComponent>())
-						m_SelectionContext.AddComponent<CameraControllerComponent>(1.0f, 1.0f, true, true);
+						m_SelectionContext.AddComponent<CameraControllerComponent>(
+							(float)GameData::m_Window->GetWidth()/GameData::m_Window->GetHeight(),
+							1.0f, 
+							true, 
+							true);
 					ImGui::CloseCurrentPopup();
 				}
 				if (ImGui::MenuItem("Спрайт")){
@@ -335,6 +339,11 @@ namespace BSE {
 			std::string buttonText = cameraController->constantAspectRatio ? "Постоянное" : "Переменное";
 			if (ImGui::Button(buttonText.c_str())) {
 				cameraController->constantAspectRatio = !cameraController->constantAspectRatio;
+			}
+			float aspectRatio = cameraController->GetAspectRatio();
+			if (ImGui::DragFloat("Соотношение:", &aspectRatio, 0.1f)){
+				cameraController->SetAspectRatio(aspectRatio);
+				cameraController->UpdateProjection();
 			}
 		});
 		
