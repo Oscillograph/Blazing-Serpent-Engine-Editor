@@ -26,6 +26,7 @@ namespace BSE {
 								float columnWidth = 100.0f);
 		void DrawComponents(Entity& entity);
 		Entity& GetSelectedEntity(){ return m_SelectionContext; }
+		void SelectEntity(Entity& entity){ m_SelectionContext = entity; m_SelectedEntity = true;}
 		bool IsSelectedEntity(){ return m_SelectedEntity; }
 	protected:
 		void DrawEntityNode(Entity& entity);

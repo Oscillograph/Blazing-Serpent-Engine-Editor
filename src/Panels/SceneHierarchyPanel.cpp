@@ -56,7 +56,7 @@ namespace BSE {
 			m_SelectedEntity = true;
 			m_SelectionContext = entity;
 			// m_CurrentlySelectedEntity = entity;
-			// BSE_INFO("Clicked Entity id: {0}", (uint32_t)entity.GetID());
+			BSE_INFO("Clicked Entity id: {0}", (uint32_t)entity.GetID());
 		}
 		
 		// Opens on RMB clicked

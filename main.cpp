@@ -323,16 +323,16 @@ public:
 				int mouseX = (int)mx;
 				int mouseY = (int)my;
 				if ((mouseX > 0) && (mouseY > 0) && (mouseX < (int)viewportSize.x) && (mouseY < (int)viewportSize.y)) {
-					ClientData::m_FrameBuffer->Bind();
+					// ClientData::m_FrameBuffer->Bind();
 					int pixelData = ClientData::m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
-					BSE_CORE_WARN("Mouse: {0}, {1} - {2}", mx, my, pixelData);
-					BSE_CORE_WARN("Buffer size: {0}, {1}", 
-						ClientData::m_FrameBuffer->GetWidth(),
-						ClientData::m_FrameBuffer->GetHeight());
-					BSE_CORE_WARN("Viewport size: {0}, {1}",
-						viewportSize.x,
-						viewportSize.y);
-					ClientData::m_FrameBuffer->Unbind();
+					if (BSE::Input::IsMouseButtonPressed((int)BSE::KeyCode::MouseButtonLeft)){
+						BSE_CORE_WARN("Mouse: {0}, {1} - {2}", mx, my, pixelData);
+						/*if (pixelData > 0){
+						  BSE::Entity tempEntity((entt::entity)pixelData, ClientData::m_ActiveScene);
+						  m_Panel->SelectEntity(tempEntity);
+						  }*/
+					}
+					// ClientData::m_FrameBuffer->Unbind();
 				}
 		
 				// ============================================

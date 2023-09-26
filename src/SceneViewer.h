@@ -44,6 +44,7 @@ public:
 		fbSpec.Attachments = { 
 			BSE::FrameBufferTextureFormat::RGBA8,
 			BSE::FrameBufferTextureFormat::RED_INTEGER,
+			// BSE::FrameBufferTextureFormat::RGBA8,
 			BSE::FrameBufferTextureFormat::Depth 
 		};
 		fbSpec.Width = m_Window->GetWidth();
@@ -146,6 +147,8 @@ public:
 			
 			// BSE_TRACE("Window Title changed");
 			BSE::Renderer2D::Clear({0.2f, 0.2f, 0.4f, 1});
+			// BSE::Renderer2D::Clear({0.0f, 0.0f, 0.0f, 0});
+			m_FrameBufferA->ClearAttachment(1, -1); // clear entity attachment
 			
 			if (ClientData::m_ActiveScene->GetCameraController() != nullptr){
 				// BSE::Renderer2D::BeginScene(ClientData::m_ActiveScene->GetCamera());
@@ -170,7 +173,9 @@ public:
 					auto [transform, sprite] = group.get<BSE::TransformComponent, BSE::SpriteComponent>(entity);
 					// Renderer::Submit(sprite, transform);
 					// TODO: remove temporary usage of renderer
-					BSE::Renderer2D::DrawQuadGeneral(transform.GetTransform(), nullptr, 1.0f, sprite.Color);
+					int32_t entityID = (int32_t)((uint32_t)entity);
+					// BSE_CORE_WARN("Render2D Entity: {0}", entityID);
+					BSE::Renderer2D::DrawQuadGeneral(transform.GetTransform(), nullptr, 1.0f, sprite.Color, nullptr, entityID);
 				}
 				
 				BSE::Renderer2D::EndScene();
