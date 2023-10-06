@@ -203,10 +203,20 @@ public:
 	}
 	
 	void OnEvent(BSE::Event& event) override {
+		BSE::EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<BSE::MouseButtonPressed>([this](BSE::MouseButtonPressed& event){
+			return OnMouseButtonPressed(event);
+		});
+		
 		// allow camera manipulation via scene
 		if (ClientData::ViewPortFocused){
 			ClientData::m_ActiveScene->GetCameraController()->OnEvent(event);
 		}
+	}
+	
+	bool OnMouseButtonPressed(BSE::MouseButtonPressed& event){
+		
+		return true;
 	}
 	
 private:

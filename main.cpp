@@ -8,6 +8,7 @@
 
 // Panels
 #include "./src/Panels/SceneHierarchyPanel.h"
+#include "./src/Panels/ContentBrowserPanel.h"
 
 using VoidFn = std::function<void(BSE::Entity& entity)>;
 using EmptyFn = std::function<void()>;
@@ -94,6 +95,7 @@ public:
 		
 		// Panels setup
 		m_Panel = new BSE::SceneHierarchyPanel();
+		m_ContentBrowserPanel = new BSE::ContentBrowserPanel();
 	}
 	
 	~EditorGuiLayer() {
@@ -306,11 +308,16 @@ public:
 				// capture mouse coordinates on scene texture
 				ImVec2 viewportOffset = ImGui::GetCursorPos();
 				ImVec2 windowSize = ImGui::GetWindowSize();
+				
+				// ImVec2 viewportMinRegion = ImGui::GetWindowContentRegionMin();
+				// ImVec2 viewportMaxRegion = ImGui::GetWindowContentRegionMax();
 				ImVec2 minBound = ImGui::GetWindowPos();
 				// minBound.x += viewportOffset.x;
 				// minBound.y += viewportOffset.y;
 		
 				ImVec2 maxBound = {minBound.x + windowSize.x, minBound.y + windowSize.y};
+				// m_ViewportBounds[0] = {viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y};
+				// m_ViewportBounds[1] = {viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y};
 				m_ViewportBounds[0] = {minBound.x, minBound.y};
 				m_ViewportBounds[1] = {maxBound.x, maxBound.y};
 		
@@ -326,11 +333,13 @@ public:
 					// ClientData::m_FrameBuffer->Bind();
 					int pixelData = ClientData::m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
 					if (BSE::Input::IsMouseButtonPressed((int)BSE::KeyCode::MouseButtonLeft)){
-						BSE_CORE_WARN("Mouse: {0}, {1} - {2}", mx, my, pixelData);
-						/*if (pixelData > 0){
-						  BSE::Entity tempEntity((entt::entity)pixelData, ClientData::m_ActiveScene);
-						  m_Panel->SelectEntity(tempEntity);
-						  }*/
+						// BSE_CORE_WARN("Mouse: {0}, {1} - {2}", mx, my, pixelData);
+						if (pixelData >= 0){
+							BSE::Entity tempEntity((entt::entity)pixelData, ClientData::m_ActiveScene);
+							m_Panel->SelectEntity(tempEntity);
+						} else {
+							m_Panel->DeSelectEntity();
+						}
 					}
 					// ClientData::m_FrameBuffer->Unbind();
 				}
@@ -346,11 +355,18 @@ public:
 					ImGuizmo::SetOrthographic(false);
 					ImGuizmo::SetDrawlist();
 					
+					//ImGuizmo::SetRect(
+					//	ImGui::GetWindowPos().x, 
+					//	ImGui::GetWindowPos().y, 
+					//	(float)ImGui::GetWindowWidth(), 
+					//	(float)ImGui::GetWindowHeight()
+					//	);
+					
 					ImGuizmo::SetRect(
-						ImGui::GetWindowPos().x, 
-						ImGui::GetWindowPos().y, 
-						(float)ImGui::GetWindowWidth(), 
-						(float)ImGui::GetWindowHeight()
+						m_ViewportBounds[0].x, 
+						m_ViewportBounds[0].y, 
+						m_ViewportBounds[1].x - m_ViewportBounds[0].x, 
+						m_ViewportBounds[1].y - m_ViewportBounds[0].y
 						);
 					
 					// Camera controller and camera itself 
@@ -410,6 +426,9 @@ public:
 		
 			m_Panel->SetContext(ClientData::m_ActiveScene);
 			m_Panel->OnImGuiRender();
+		
+			m_ContentBrowserPanel->SetContext(ClientData::m_ActiveScene);
+			m_ContentBrowserPanel->OnImGuiRender();
 		
 			ImGui::PopFont();
 		ImGui::End();
@@ -483,6 +502,7 @@ private:
 	
 	// Panels
 	BSE::SceneHierarchyPanel* m_Panel = nullptr;
+	BSE::ContentBrowserPanel* m_ContentBrowserPanel = nullptr;
 	
 	// tools
 	int m_GizmoType = -1;

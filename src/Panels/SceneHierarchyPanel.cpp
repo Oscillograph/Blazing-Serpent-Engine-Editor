@@ -353,4 +353,8 @@ namespace BSE {
 			ImGui::ColorEdit4("Цвет", glm::value_ptr(color));
 		});
 	}
+	
+	//bool SceneHierarchyPanel::OnMouseButtonPressed(BSE::MouseButtonPressed& event){
+	//	return true;
+	//}
 }

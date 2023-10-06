@@ -27,9 +27,12 @@ namespace BSE {
 		void DrawComponents(Entity& entity);
 		Entity& GetSelectedEntity(){ return m_SelectionContext; }
 		void SelectEntity(Entity& entity){ m_SelectionContext = entity; m_SelectedEntity = true;}
+		void DeSelectEntity(){ m_SelectedEntity = false; }
 		bool IsSelectedEntity(){ return m_SelectedEntity; }
+		bool HasEntity(int entityID){ return m_Context->HasEntity(entityID); }
 	protected:
 		void DrawEntityNode(Entity& entity);
+		// bool OnMouseButtonPressed(BSE::MouseButtonPressed& event);
 		
 	private:
 		Scene* m_Context;
