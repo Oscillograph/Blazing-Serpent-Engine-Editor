@@ -2,10 +2,12 @@
 #define BSEEDITOR_CLIENTDATA_H
 
 #include <BSE_Client.h>
+#include <filesystem>
 
 struct ClientData {
 	static bool ViewPortFocused;
 	
+	static std::filesystem::path g_AssetsDirectory;
 	
 	// Scene Viewer
 	static BSE::Scene* m_ActiveScene;

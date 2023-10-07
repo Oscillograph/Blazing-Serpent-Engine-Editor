@@ -344,6 +344,17 @@ public:
 					// ClientData::m_FrameBuffer->Unbind();
 				}
 		
+				// import from content browser panel
+				if (ImGui::BeginDragDropTarget()){
+					const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Content_Browser_Item");
+					if (payload != nullptr){
+						std::filesystem::path path = std::string((char*)payload->Data);
+						std::string filepath = (ClientData::g_AssetsDirectory / path).string();
+						OpenScene(filepath);
+						ImGui::EndDragDropTarget();
+					}
+				}  
+		
 				// ============================================
 				// Gizmos
 				// m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
@@ -480,6 +491,15 @@ public:
 	
 	void OpenScene(){
 		std::string filepath = BSE::FileDialogs::OpenFile("Blazing Serpent Engine Scene (*.BSEScene)\0*.BSEScene\0");
+		if (filepath.size() > 0){
+			NewScene();
+			
+			BSE::SceneSerializer serializer(ClientData::m_ActiveScene);
+			serializer.DeserializeFromFile(filepath);
+		}
+	}
+	
+	void OpenScene(const std::string& filepath){
 		if (filepath.size() > 0){
 			NewScene();
 			
