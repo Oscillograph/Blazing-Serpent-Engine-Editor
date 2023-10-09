@@ -2,7 +2,6 @@
 #define BSEEDITOR_CLIENTDATA_H
 
 #include <BSE_Client.h>
-#include <filesystem>
 
 struct ClientData {
 	static bool ViewPortFocused;

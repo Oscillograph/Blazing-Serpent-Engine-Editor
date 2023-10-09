@@ -175,7 +175,14 @@ public:
 					// TODO: remove temporary usage of renderer
 					int32_t entityID = (int32_t)((uint32_t)entity);
 					// BSE_CORE_WARN("Render2D Entity: {0}", entityID);
-					BSE::Renderer2D::DrawQuadGeneral(transform.GetTransform(), nullptr, 1.0f, sprite.Color, nullptr, entityID);
+					BSE::Renderer2D::DrawQuadGeneral(
+						transform.GetTransform(), 
+						sprite.Texture, 
+						sprite.TilingFactor, 
+						sprite.Color, 
+						nullptr, 
+						entityID
+						);
 				}
 				
 				BSE::Renderer2D::EndScene();

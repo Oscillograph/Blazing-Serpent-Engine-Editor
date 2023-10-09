@@ -349,8 +349,29 @@ namespace BSE {
 		
 		DrawComponent<SpriteComponent>("Sprite", entity, [this](Entity& entity){
 			auto& color = m_Context->Registry().get<SpriteComponent>(entity.GetID()).Color;
+			auto& texture = m_Context->Registry().get<SpriteComponent>(entity.GetID()).Texture;
+			auto& tilingFactor = m_Context->Registry().get<SpriteComponent>(entity.GetID()).TilingFactor;
 			
+			// color
 			ImGui::ColorEdit4("Цвет", glm::value_ptr(color));
+			
+			// texture
+			ImGui::Button("Текстура", ImVec2(100.0f, 0.0f));
+
+			if (ImGui::BeginDragDropTarget()){
+				const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("Asset_Texture");
+				if (payload != nullptr){
+					std::filesystem::path path = std::string((char*)payload->Data);
+					std::string filepath = (ClientData::g_AssetsDirectory / path).string();
+					texture = Texture2D::Create(filepath);
+					
+					ImGui::EndDragDropTarget();
+				}
+			}
+			
+			// tiling factor
+			ImGui::DragFloat("Плитка", &tilingFactor, 0.1f, 0.0f, 100.0f);
+			
 		});
 	}
 	

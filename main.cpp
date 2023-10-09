@@ -87,11 +87,21 @@ void DrawVec3Control(	const std::string& label,
 	ImGui::Columns(1);
 }
 
+enum class SceneState {
+	Edit = 0,
+	Play = 1
+};
+
 class EditorGuiLayer : public BSE::ImGuiLayer {
 public:
 	EditorGuiLayer() {
 		broTexture = BSE::Texture2D::Create("./assets/img/broscillograph.png");
 		broTexture->Bind();
+		
+		m_IconPlay = BSE::Texture2D::Create("./assets/img/icon_play.png");
+		m_IconPlay->Bind();
+		m_IconStop = BSE::Texture2D::Create("./assets/img/icon_stop.png");
+		m_IconStop->Bind();
 		
 		// Panels setup
 		m_Panel = new BSE::SceneHierarchyPanel();
@@ -274,6 +284,8 @@ public:
 				}
 			ImGui::End();
 		
+			UI_Toolbar();
+		
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 			ImGui::Begin("Сцена");
 				// TODO: AssetManager, GameData storage
@@ -353,7 +365,7 @@ public:
 						OpenScene(filepath);
 						ImGui::EndDragDropTarget();
 					}
-				}  
+				}
 		
 				// ============================================
 				// Gizmos
@@ -382,7 +394,7 @@ public:
 					
 					// Camera controller and camera itself 
 					auto cameraController = ClientData::m_ActiveScene->GetCameraController();
-					auto camera = ClientData::m_ActiveScene->GetCameraController()->GetCamera();
+					auto camera = cameraController->GetCamera();
 					
 					glm::mat4 cameraView = camera->GetViewMatrix();
 					glm::mat4 cameraProjection = camera->GetProjectionMatrix();
@@ -405,26 +417,30 @@ public:
 					// ----------------------
 					
 					ImGuizmo::Manipulate(
-						glm::value_ptr(cameraView), 
-						glm::value_ptr(cameraProjection),
+						(float*)glm::value_ptr(cameraView), 
+						(float*)glm::value_ptr(cameraProjection),
 						// glm::value_ptr(transform),
 						(ImGuizmo::OPERATION)m_GizmoType, 
-						ImGuizmo::LOCAL,
-						glm::value_ptr(transform),
-						nullptr,
+						ImGuizmo::WORLD,
+						(float*)glm::value_ptr(transform),
+						(float*)((void*)0),
 						snap ? snapValues : nullptr
 						);
 					
 					if (ImGuizmo::IsUsing) {
 						glm::vec3 scale;
 						glm::quat rotation;
+						// glm::vec3 rotation;
 						glm::vec3 translation;
 						glm::vec3 skew;
 						glm::vec4 perspective;
 						glm::decompose(transform, scale, rotation, translation, skew, perspective);
 						
+						// ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(transform), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+						
 						transformComponent.Translation = translation;
 						transformComponent.Rotation = -glm::eulerAngles(glm::conjugate(rotation));;
+						// transformComponent.Rotation = glm::radians(rotation);
 						transformComponent.Scale = scale;
 					}
 				} else {
@@ -514,11 +530,53 @@ public:
 	
 	void CloseScene(){}
 	
+	
+	void OnScenePlay(){
+		m_SceneState = SceneState::Play;
+	}
+	
+	void OnSceneStop(){
+		m_SceneState = SceneState::Edit;
+	}
+	
+	// UI
+	void UI_Toolbar(){
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, 	ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		
+		ImGui::PushStyleColor(ImGuiCol_Button, 			ImVec4(0, 0, 0, 0));
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, 	ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, 	ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+		
+		ImGui::Begin("##Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		float iconSize = ImGui::GetWindowHeight() - 4.0f;
+		BSE::Texture2D* icon = (m_SceneState == SceneState::Edit) ? m_IconPlay : m_IconStop;
+		ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x * 0.5f - iconSize * 0.5f);
+		if (ImGui::ImageButton("##PlayButton", (ImTextureID)icon->GetID(), ImVec2(iconSize, iconSize), ImVec2(0, 0), ImVec2(1, 1))){
+			if (m_SceneState == SceneState::Edit){
+				OnScenePlay();
+			} else {
+				if (m_SceneState == SceneState::Play){
+					OnSceneStop();
+				}
+			}
+		}
+		ImGui::End();
+		
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+	}
+	
 private:
 	float layerTime = 0.0f;
 	glm::vec2 m_ViewportSize = {600.0f, 400.0f};
 	glm::vec2 m_ViewportBounds[2];
 	BSE::Texture2D* broTexture;
+	BSE::Texture2D* m_IconPlay;
+	BSE::Texture2D* m_IconStop;
 	
 	// Panels
 	BSE::SceneHierarchyPanel* m_Panel = nullptr;
@@ -526,6 +584,7 @@ private:
 	
 	// tools
 	int m_GizmoType = -1;
+	SceneState m_SceneState = SceneState::Edit;
 };
 
 class Editor : public BSE::Application {
