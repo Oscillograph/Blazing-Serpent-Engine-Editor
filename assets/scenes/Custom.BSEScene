@@ -1,0 +1,61 @@
+Scene: Unnamed
+Entities:
+  - Entity: 3
+    NameComponent:
+      Name: Front
+    TransformComponent:
+      Translation: [-0.354999989, 0, 0]
+      Rotation: [0, -0.785398126, 0]
+      Scale: [0.999999881, 0.999999881, 0.999999881]
+    SpriteComponent:
+      Color: [0.903474927, 0.903474927, 0.903474927, 1]
+  - Entity: 2
+    NameComponent:
+      Name: Side
+    TransformComponent:
+      Translation: [0.354999989, 0, 0]
+      Rotation: [-0, 0.785398126, -0]
+      Scale: [0.999999881, 1, 0.999999881]
+    SpriteComponent:
+      Color: [0.783783793, 0.783783793, 0.783783793, 1]
+  - Entity: 1
+    NameComponent:
+      Name: Top
+    TransformComponent:
+      Translation: [0, 0.5, -0.354999989]
+      Rotation: [1.57079637, 2.98023224e-08, 0.785398185]
+      Scale: [0.999999881, 0.999999881, 0.999990046]
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+  - Entity: 0
+    NameComponent:
+      Name: Камера
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0, 0, -0]
+      Scale: [1, 1, 1]
+    CameraControllerComponent:
+      Player Controlled: false
+      Works: true
+      CameraController:
+        EditorCamera: true
+        Rotatable: true
+        Translatable: true
+        Zoomable: true
+        ConstantAspectRatio: false
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.100000001
+        PerspectiveFar: 1000
+        OrthographicCameraBounds: [-0.150000006, 0.150000006, 0.150000006, -0.150000006, -2, 16]
+        AspectRatio: 0.666999996
+        ZoomLevel: 0.300000012
+        Camera:
+          ProjectionMatrix: [3.61951041, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00019991, -1, 0, 0, -0.20002, 0]
+          ViewMatrix: [0.998341799, -0.024509564, -0.0520854928, 0, 0, 0.904827118, -0.425779164, 0, 0.0575640276, 0.425073147, 0.90332675, 0, 0.179217577, 1.54623473, 2.29597044, 1]
+          ViewProjectionMatrix: [3.6135087, 4.49682291e-09, -0.057575535, -0.0575640276, -0.0887126252, 2.18444562, -0.425158113, -0.425073147, -0.188523978, -1.0279218, -0.903507352, -0.90332675, -0.0775881931, -1.01758802, 2.54211855, 2.7415905]
+          Position: [0.179217577, 1.54623473, 2.29597044]
+          Rotation: [-25.1999912, 3.30000019, 0]
+          RotationX: -25.1999912
+          RotationY: 3.30000019
+          RotationZ: 0

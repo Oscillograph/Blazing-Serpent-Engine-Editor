@@ -1,0 +1,90 @@
+Scene: Unnamed
+Entities:
+  - Entity: 6
+    NameComponent:
+      Name: Front
+    TransformComponent:
+      Translation: [-0.354999989, 0, 0]
+      Rotation: [0, -0.785398126, 0]
+      Scale: [0.999999881, 0.999999881, 0.999999881]
+    SpriteComponent:
+      Color: [0.903474927, 0.903474927, 0.903474927, 1]
+  - Entity: 5
+    NameComponent:
+      Name: Side
+    TransformComponent:
+      Translation: [0.354999989, 0, 0]
+      Rotation: [-0, 0.785398126, -0]
+      Scale: [0.999999881, 1, 0.999999881]
+    SpriteComponent:
+      Color: [0.783783793, 0.783783793, 0.783783793, 1]
+  - Entity: 4
+    NameComponent:
+      Name: Top
+    TransformComponent:
+      Translation: [0, 0.5, -0.354999989]
+      Rotation: [1.57079637, 2.98023224e-08, 0.785398185]
+      Scale: [0.999999881, 0.999999881, 0.999990046]
+    SpriteComponent:
+      Color: [1, 1, 1, 1]
+  - Entity: 3
+    NameComponent:
+      Name: Камера
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [-0, 0, -0]
+      Scale: [1, 2, 1]
+    CameraControllerComponent:
+      Player Controlled: false
+      Works: true
+      CameraController:
+        EditorCamera: true
+        Rotatable: true
+        Translatable: true
+        Zoomable: true
+        ConstantAspectRatio: false
+        ProjectionType: 0
+        PerspectiveFOV: 45
+        PerspectiveNear: 0.100000001
+        PerspectiveFar: 1000
+        OrthographicCameraBounds: [-0.100000009, 0.100000009, 0.150000006, -0.150000006, -2, 16]
+        AspectRatio: 1.03092778
+        ZoomLevel: 0.300000012
+        Camera:
+          ProjectionMatrix: [2.34178734, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00019991, -1, 0, 0, -0.20002, 0]
+          ViewMatrix: [0.995055556, -0.0344575681, -0.0931508988, 0, 0, 0.93788892, -0.346935689, 0, 0.099319756, 0.345220298, 0.93325156, 0, 0.286796302, 1.11226714, 2.30320907, 1]
+          ViewProjectionMatrix: [2.33020878, -8.99364672e-09, -0.0993396267, -0.0993197709, -0.0806923062, 2.26426411, -0.34528935, -0.345220327, -0.218139619, -0.837576866, -0.933438241, -0.933251679, -0.0761227161, -0.589351833, 2.36242771, 2.56193566]
+          Position: [0.286796302, 1.11226714, 2.30320907]
+          Rotation: [-20.3000011, 5.70000029, 0]
+          RotationX: -20.3000011
+          RotationY: 5.70000029
+          RotationZ: 0
+    SpriteComponent:
+      Color: [0, 1, 0, 1]
+  - Entity: 2
+    NameComponent:
+      Name: 4th (Red)
+    TransformComponent:
+      Translation: [0, -0.5, 0]
+      Rotation: [-0, 0, -0]
+      Scale: [1, 1, 1]
+    SpriteComponent:
+      Color: [1, 0, 0, 1]
+  - Entity: 1
+    NameComponent:
+      Name: 5th (Teal)
+    TransformComponent:
+      Translation: [0, 0.600000024, 0]
+      Rotation: [-0, 1.57045102, -0]
+      Scale: [1, 0.999991179, 1]
+    SpriteComponent:
+      Color: [0, 1, 0.98841691, 1]
+  - Entity: 0
+    NameComponent:
+      Name: 6th (Black)
+    TransformComponent:
+      Translation: [0, 0.800000012, 0]
+      Rotation: [1.57079637, 0, -0]
+      Scale: [0.999865174, 1, 1]
+    SpriteComponent:
+      Color: [0, 0, 0, 1]
