@@ -6,7 +6,9 @@ Entities:
     TransformComponent:
       Translation: [0, 0.800000012, 0]
       Rotation: [1.57079637, 0, -0]
-      Scale: [0.999865174, 1, 1]
+      Scale: [0.999818802, 1, 1]
+    UUIDComponent:
+      UUID: 4744684162758568100
     SpriteComponent:
       Color: [0, 0, 0, 1]
   - Entity: 5
@@ -16,6 +18,8 @@ Entities:
       Translation: [0, 0.600000024, 0]
       Rotation: [-0, 1.57045102, -0]
       Scale: [1, 0.999991179, 1]
+    UUIDComponent:
+      UUID: 1341361493841395527
     SpriteComponent:
       Color: [0, 1, 0.98841691, 1]
   - Entity: 4
@@ -25,6 +29,8 @@ Entities:
       Translation: [0, -0.5, 0]
       Rotation: [-0, 0, -0]
       Scale: [1, 1, 1]
+    UUIDComponent:
+      UUID: 12940984508036701322
     SpriteComponent:
       Color: [1, 0, 0, 1]
   - Entity: 3
@@ -34,6 +40,8 @@ Entities:
       Translation: [0, 0, 0]
       Rotation: [-0, 0, -0]
       Scale: [1, 2, 1]
+    UUIDComponent:
+      UUID: 16048969607359495661
     CameraControllerComponent:
       Player Controlled: false
       Works: true
@@ -68,6 +76,8 @@ Entities:
       Translation: [0, 0.5, -0.354999989]
       Rotation: [1.57079637, 2.98023224e-08, 0.785398185]
       Scale: [0.999999881, 0.999999881, 0.999990046]
+    UUIDComponent:
+      UUID: 9750831875489182105
     SpriteComponent:
       Color: [1, 1, 1, 1]
   - Entity: 1
@@ -77,6 +87,8 @@ Entities:
       Translation: [0.354999989, 0, 0]
       Rotation: [-0, 0.785398126, -0]
       Scale: [0.999999881, 1, 0.999999881]
+    UUIDComponent:
+      UUID: 4691817312586543413
     SpriteComponent:
       Color: [0.783783793, 0.783783793, 0.783783793, 1]
   - Entity: 0
@@ -86,5 +98,7 @@ Entities:
       Translation: [-0.354999989, 0, 0]
       Rotation: [0, -0.785398126, 0]
       Scale: [0.999999881, 0.999999881, 0.999999881]
+    UUIDComponent:
+      UUID: 5125598604353752588
     SpriteComponent:
       Color: [0.903474927, 0.903474927, 0.903474927, 1]

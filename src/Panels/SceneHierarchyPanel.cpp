@@ -216,6 +216,12 @@ namespace BSE {
 			}
 			
 			if (ImGui::BeginPopup("Add component")){
+				if (ImGui::MenuItem("Уникальный идентификатор")){
+					if (!m_SelectionContext.HasComponent<UUIDComponent>())
+						m_SelectionContext.AddComponent<UUIDComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+				
 				if (ImGui::MenuItem("Камера")){
 					if (!m_SelectionContext.HasComponent<CameraControllerComponent>())
 						m_SelectionContext.AddComponent<CameraControllerComponent>(
@@ -225,15 +231,24 @@ namespace BSE {
 							true);
 					ImGui::CloseCurrentPopup();
 				}
+				
 				if (ImGui::MenuItem("Спрайт")){
 					if (!m_SelectionContext.HasComponent<SpriteComponent>())
 						m_SelectionContext.AddComponent<SpriteComponent>();
 					ImGui::CloseCurrentPopup();
 				}
+				
 				ImGui::EndPopup();
 			}
 			
 			ImGui::Columns(1);
+		}, false);
+		
+		DrawComponent<UUIDComponent>("Идентификатор", entity, [this](Entity& entity){
+			auto& idComponent = m_Context->Registry().get<UUIDComponent>(entity.GetID());
+			std::stringstream idString;
+			idString << idComponent.ID;
+			ImGui::Text(idString.str().c_str());
 		}, false);
 		
 		DrawComponent<TransformComponent>("Transform", entity, [this](Entity& entity){
